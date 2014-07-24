@@ -1,0 +1,11 @@
+﻿<Window x:Name="FullScreenWindow" x:Class="Visualiser.OpenTKFull"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Visualisation" WindowStyle="None" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized"
+        ShowInTaskbar="False" KeyDown="FullScreenWindow_KeyDown" Loaded="FullScreenWindow_Loaded">
+    <Grid>
+        <WindowsFormsHost x:Name="openTKFullHost"/>
+
+    </Grid>
+</Window>
