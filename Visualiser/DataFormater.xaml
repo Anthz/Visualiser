@@ -8,7 +8,7 @@
                        ><Run Text="To be able to interpret the data, a format must be "/><Run Language="en-gb" Text="supplied to attribute the values to specific variables. Each line represents a collection of information relating to an individual data point. "/><Run FontWeight="Bold" Language="en-gb" Text="Example" TextDecorations="Underline"/><LineBreak/><Run Language="en-gb" Text="Input: 23 45 68 255"/><LineBreak/><Run Language="en-gb" Text="Format: X Y Z 1 "/><Run FontSize="10" Language="en-gb" Text="(xyz = coordinates, 1,2,3... = data value)"/><LineBreak/><Run Language="en-gb" Text="Output: X=23, Y=45, Z=68, 1=255"/></TextBlock>
         </GroupBox>
         <GroupBox Header="Format" HorizontalAlignment="Left" Margin="10,176,0,0" VerticalAlignment="Top" Width="272" Height="55">
-            <TextBox HorizontalAlignment="Left" Height="23" Margin="10,6,-2,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="242"/>
+            <TextBox x:Name="formatTextBox" HorizontalAlignment="Left" Height="23" Margin="10,6,-2,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="242"/>
         </GroupBox>
         <Button x:Name="dataFormatCancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="30,242,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="dataFormatCancelButton_Click"/>
         <Button x:Name="dataFormatOKButton" Content="OK" HorizontalAlignment="Left" Margin="187,242,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="dataFormatOKButton_Click"/>

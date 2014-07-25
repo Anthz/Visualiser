@@ -19,12 +19,34 @@ namespace Visualiser
 {
     public partial class MainWindow : Window
     {
+        static string format;
         OpenTKFull openTKFull;
         List<string> frameData;
+        private int _currentFrame = 0;
+
+        public int CurrentFrame
+        {
+            get { return _currentFrame; }
+
+            set
+            {
+                _currentFrame = value;
+                currentFrameTextBlock.Text = "Current Frame: " + _currentFrame;
+                if(_currentFrame > 0)
+                    dataTextBox.Text = frameData[_currentFrame - 1];
+                else
+                    dataTextBox.Text = "";
+            }
+        }
         
         public MainWindow()
         {
             InitializeComponent();
+
+            //new event handler for text input as "textinput" doesn't fire
+            dataTextBox.AddHandler(TextBox.TextInputEvent,
+                                    new TextCompositionEventHandler(dataTextBox_TextInput), 
+                                    true);
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -68,8 +90,11 @@ namespace Visualiser
             riftCheckBox.IsChecked = false;
             animatedCheckBox.IsChecked = false;
             modelComboBox.SelectedIndex = 0;
-            dataTextBox.Visibility = Visibility.Visible;
+            dataGrid.Visibility = Visibility.Visible;
             animationGrid.Visibility = Visibility.Hidden;
+            animationStatsGrid.Visibility = Visibility.Hidden;
+            CurrentFrame = 0;
+            frameCountTextBlock.Text = "0 Frames Loaded";
             loadDataButton.Content = "Load Data";
         }
 
@@ -77,14 +102,20 @@ namespace Visualiser
         {
             DataFormater formatWindow = new DataFormater();
             Nullable<bool> result = formatWindow.ShowDialog();
+            string tempFormat = format;
+            format = formatWindow.formatTextBox.Text;
 
             if(result == true)
             {
-                //format set
+                //format set - if frame count != 0 check against frames
+                //else check on creation of frame
+                int i = 0;
+                
             }
             else
             {
                 //format cancelled
+                format = tempFormat;
             }
         }
 
@@ -104,6 +135,8 @@ namespace Visualiser
 
         private void FileLoader(bool multi)
         {
+            int prevCount = frameData.Count;
+
             Microsoft.Win32.OpenFileDialog filePicker = new Microsoft.Win32.OpenFileDialog();
 
             if(multi)
@@ -130,12 +163,14 @@ namespace Visualiser
                         }
                     }
 
-                    frameData.Add(combinedText);
+                    //frameList.add(new Frame(fileNames[i], combinedText (or line array), lines.length));
 
-                    if(frameData.Count == 1)
-                        dataTextBox.Text = combinedText;
+                    frameData.Add(combinedText);
                 }
-                
+                if(prevCount == 0 && frameData.Count > 0)
+                {
+                    CurrentFrame = 1;
+                }
             }
         }
 
@@ -162,8 +197,9 @@ namespace Visualiser
 
         private void animatedCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            dataTextBox.Visibility = Visibility.Hidden;
+            dataGrid.Visibility = Visibility.Hidden;
             animationGrid.Visibility = Visibility.Visible;
+            animationStatsGrid.Visibility = Visibility.Visible;
             loadDataButton.Content = "Load Frames";
             frameCountTextBlock.Text = frameData.Count + " Frames Loaded";
         }
@@ -187,10 +223,85 @@ namespace Visualiser
             }
             else
             {
-                dataTextBox.Visibility = Visibility.Visible;
+                dataGrid.Visibility = Visibility.Visible;
                 animationGrid.Visibility = Visibility.Hidden;
+                animationStatsGrid.Visibility = Visibility.Hidden;
                 loadDataButton.Content = "Load Data";
             }
+        }
+
+        private void stepBackButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (frameData.Count == 0)
+            {
+                //do nothing
+            }
+            else
+            {
+                if (CurrentFrame == 1)
+                {
+                    CurrentFrame = frameData.Count;
+                }
+                else
+                {
+                    CurrentFrame--;
+                }
+            }
+        }
+
+        private void stepForwardButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(frameData.Count == 0)
+            {
+                //do nothing
+            }
+            else
+            {
+                if(CurrentFrame == frameData.Count)
+                {
+                    CurrentFrame = 1;
+                }
+                else
+                {
+                    CurrentFrame++;
+                }
+            }
+        }
+
+        private void viewFrameDataButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (animationGrid.Visibility == Visibility.Visible)
+            {
+                animationGrid.Visibility = Visibility.Hidden;
+                dataGrid.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                animationGrid.Visibility = Visibility.Visible;
+                dataGrid.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void saveDataButton_Click(object sender, RoutedEventArgs e)
+        {
+            //save text box to frame data
+            if(frameData.Count == 0)
+            {
+                Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+                //if no frames loaded, open save dialog with blank name
+                //if frames found, set directory and name of current frame
+            }
+        }
+
+        private void dataTextBox_TextInput(object sender, TextCompositionEventArgs e)
+        {
+            if(saveDataButton.Visibility == Visibility.Hidden)
+                saveDataButton.Visibility = Visibility.Visible;
+        }
+
+        private void customModelSelection_Selected(object sender, RoutedEventArgs e)
+        {
+            //model loader from project
         }
     }
 }
