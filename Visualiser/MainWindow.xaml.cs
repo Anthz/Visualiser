@@ -17,35 +17,44 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Visualiser
 {
-    public struct Format
-    {
-        public int x;
-        public int y;
-        public int z;
-        public int data1;
-        public int data2;
-        public int data3;
-        public bool correctFormat;
-    }
-
     public partial class MainWindow : Window
     {
         OpenTKFull openTKFull;
-        //List<string> frameData;
         private List<Frame> frames;
-        public static Format format;
-        private int _currentFrame = 0;
+        public static Dictionary<string, int> format;
+        private int currentFrame = 0;
+        bool correctFormat;
+        private string status;
+        int statusDelay = 2000;
 
         public int CurrentFrame
         {
-            get { return _currentFrame; }
+            get { return currentFrame; }
 
             set
             {
-                _currentFrame = value;
-                currentFrameTextBlock.Text = "Current Frame: " + _currentFrame;
-                dataTextBox.Text = _currentFrame > 0 ? frames[_currentFrame - 1].displayData : "";
+                currentFrame = value;
+                currentFrameTextBlock.Text = "Current Frame: " + currentFrame;
+                dataTextBox.Text = currentFrame > 0 ? frames[currentFrame - 1].displayData : "";
             }
+        }
+
+        public string Status
+        {
+            get { return status; }
+
+            set
+            {
+                status = value;
+                ShowStatus();
+            }
+        }
+
+        private async void ShowStatus()
+        {
+            statusTextBlock.Text = status;
+            await Task.Delay(statusDelay);
+            statusTextBlock.Text = "";
         }
         
         public MainWindow()
@@ -94,7 +103,10 @@ namespace Visualiser
         private void Reset()
         {
             frames.Clear();
+            if(format != null)
+                format.Clear();
             dataTextBox.Clear();
+            correctFormat = false;
             leapCheckBox.IsChecked = false;
             riftCheckBox.IsChecked = false;
             animatedCheckBox.IsChecked = false;
@@ -104,88 +116,73 @@ namespace Visualiser
             animationStatsGrid.Visibility = Visibility.Hidden;
             saveDataButton.Visibility = Visibility.Hidden;
             CurrentFrame = 0;
-            frameCountTextBlock.Text = "0 Frames Loaded";
+            frameCountTextBlock.Text = "Frame Count = 0";
             loadDataButton.Content = "Load Data";
+            status = "";
         }
 
         private void dataFormatButton_Click(object sender, RoutedEventArgs e)
         {
             DataFormater formatWindow = new DataFormater();
             bool? result = formatWindow.ShowDialog();
-            Format tempFormat = format;
+            Dictionary<string, int> tempFormat = format;
             
             if(result == true)
             {
                 string inputFormat = formatWindow.formatTextBox.Text.ToLower();
-                format = new Format();
-                format.correctFormat = true;
+                format = new Dictionary<string, int>();
+                correctFormat = true;
                 string[] splitFormat = inputFormat.Split(' ');
                 for(int i = 0; i < splitFormat.Length; i++)
                 {
-                    switch(splitFormat[i])
-                    {
-                        case "x":
-                            format.x = i + 1;
-                            break;
-                        case "y":
-                            format.y = i + 1;
-                            break;
-                        case "z":
-                            format.z = i + 1;
-                            break;
-                        case "1":
-                            format.data1 = i + 1;
-                            break;
-                        case "2":
-                            format.data2 = i + 1;
-                            break;
-                        case "3":
-                            format.data3 = i + 1;
-                            break;
-                        default:
-                            format.correctFormat = false;
-                            break;
-                    }
+                    format.Add(splitFormat[i], i);
                 }
 
                 //if format doesn't contain any axis, prompt for new format
                 if(!splitFormat.Contains("x") && !splitFormat.Contains("y") && !splitFormat.Contains("z"))
                 {
-                    format.correctFormat = false;
+                    correctFormat = false;
+                    ShowFailedFormatDialog(0);
                 }
 
-                List<int> failedFrames = new List<int>();
-
                 //format correct up to now - if frame count != 0 check against frames
-                if(format.correctFormat)
+                if(correctFormat)
                 {
                     if(frames.Count > 0)
                     {
+                        List<int> failedFrames = new List<int>();
+
                         for(int i = 0; i < frames.Count; i++)
                         {
                             if(!frames[i].FormatData())
                             {
                                 failedFrames.Add(i + 1); //make list of frames it failed to format for error message
-                                format.correctFormat = false;
+                                correctFormat = false;
                             }
+                        }
+                        if(failedFrames.Count > 0)
+                        {
+                            ShowFailedFormatDialog(1, failedFrames);
+                        }
+                        else
+                        {
+                            Status = "Format successfully loaded";
                         }
                     }
                     else
                     {
                         //check on creation of frame
+                        Status = "Format preloaded";
                     }
                 }
                 else
                 {
                     format = tempFormat;    //if not correct then reset to prev
                 }
-                    
-
             }
             else
             {
                 //format cancelled
-                
             }
         }
 
@@ -193,7 +190,8 @@ namespace Visualiser
         {
             FileLoader(loadDataButton.Content.ToString() != "Load Data");
 
-            frameCountTextBlock.Text = frames.Count + " Frames Loaded";
+            Status = frames.Count + " Frame(s) Loaded";
+            frameCountTextBlock.Text = "Frame Count: " + frames.Count;
         }
 
         private void FileLoader(bool multi)
@@ -228,10 +226,65 @@ namespace Visualiser
 
                     frames.Add(new Frame(t, lines, combinedText));
                 }
+
                 if(prevCount == 0 && frames.Count > 0)
                 {
                     CurrentFrame = 1;
+                    if(correctFormat)
+                    {
+                        List<int> failedFrames = new List<int>();
+
+                        for (int i = 0; i < frames.Count; i++)
+                        {
+                            if(!frames[i].FormatData())
+                            {
+                                failedFrames.Add(i + 1); //make list of frames it failed to format for error message
+                                correctFormat = false;
+                            }
+                        }
+
+                        if(failedFrames.Count > 0)
+                        {
+                            ShowFailedFormatDialog(1, failedFrames);
+                        }
+                    }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Displays various error messages relating to formatting
+        /// </summary>
+        /// <param name="errorID">0 - No axis, 1 - Failed to format certain frames (use overrided func)</param>
+        public void ShowFailedFormatDialog(int errorID)
+        {
+            ShowFailedFormatDialog(errorID, null);
+        }
+
+        public void ShowFailedFormatDialog(int errorID, List<int> failedFrames)
+        {
+            string messageText = "";
+            const string messageTitle = "Formatting Error";
+            const MessageBoxButton button = MessageBoxButton.OK;
+            const MessageBoxImage icon = MessageBoxImage.Error;
+
+            switch(errorID)
+            {
+                case 0:
+                    messageText = "Please enter at least one axis to allow the data to be placed in the virtual scene.";
+                    Status = "No axes";
+                    break;
+                case 1:
+                    messageText = "The format provided failed to parse:\r\nFrame " + string.Join(", Frame ", failedFrames.ToArray());
+                    Status = "Formatting failed";
+                    break;
+            }
+
+            MessageBoxResult result = MessageBox.Show(messageText, messageTitle, button, icon);
+
+            if(result == MessageBoxResult.OK)
+            {
+                format.Clear();
             }
         }
 
@@ -262,7 +315,7 @@ namespace Visualiser
             animationGrid.Visibility = Visibility.Visible;
             animationStatsGrid.Visibility = Visibility.Visible;
             loadDataButton.Content = "Load Frames";
-            frameCountTextBlock.Text = frames.Count + " Frames Loaded";
+            frameCountTextBlock.Text = "Frame Count: " + frames.Count;
         }
 
         private void animatedCheckBox_Unchecked(object sender, RoutedEventArgs e)
@@ -368,7 +421,7 @@ namespace Visualiser
         private void dataTextBox_KeyUp(object sender, KeyEventArgs e)
         {
             if(e.Key == Key.Back)
-                saveButton.Visibility = Visibility.Visible;
+                saveDataButton.Visibility = Visibility.Visible;
         }
     }
 }

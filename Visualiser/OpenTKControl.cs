@@ -18,6 +18,17 @@ namespace Visualiser
 
             openTKWindow.Load += OpenTKWindow_Load;
             openTKWindow.Paint += OpenTKWindow_Paint;
+            openTKWindow.Resize += openTKWindow_Resize;
+        }
+
+        public static void openTKWindow_Resize(object sender, EventArgs e)
+        {
+            GL.Viewport(0, 0, openTKWindow.Size.Width, openTKWindow.Size.Height);
+            //Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, openTKWindow.Size.Width / (float)openTKWindow.Size.Height, 1.0f, 64.0f);
+
+            //GL.MatrixMode(MatrixMode.Projection);
+
+            //GL.LoadMatrix(ref projection);
         }
 
         public static void OpenTKWindow_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
@@ -30,9 +41,9 @@ namespace Visualiser
             // Draw a little yellow triangle
             GL.Color3(System.Drawing.Color.Yellow);
             GL.Begin(BeginMode.Triangles);
-            GL.Vertex2(200, 50);
-            GL.Vertex2(200, 200);
-            GL.Vertex2(100, 50);
+            GL.Vertex2(0.0, 0.0);
+            GL.Vertex2(100.0, 0.0);
+            GL.Vertex2(50.0, 100.0);
             GL.End();
 
             openTKWindow.SwapBuffers();
