@@ -17,11 +17,23 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Visualiser
 {
+    public struct Format
+    {
+        public int x;
+        public int y;
+        public int z;
+        public int data1;
+        public int data2;
+        public int data3;
+        public bool correctFormat;
+    }
+
     public partial class MainWindow : Window
     {
-        static string format;
         OpenTKFull openTKFull;
-        List<string> frameData;
+        //List<string> frameData;
+        private List<Frame> frames;
+        public static Format format;
         private int _currentFrame = 0;
 
         public int CurrentFrame
@@ -32,10 +44,7 @@ namespace Visualiser
             {
                 _currentFrame = value;
                 currentFrameTextBlock.Text = "Current Frame: " + _currentFrame;
-                if(_currentFrame > 0)
-                    dataTextBox.Text = frameData[_currentFrame - 1];
-                else
-                    dataTextBox.Text = "";
+                dataTextBox.Text = _currentFrame > 0 ? frames[_currentFrame - 1].displayData : "";
             }
         }
         
@@ -44,7 +53,7 @@ namespace Visualiser
             InitializeComponent();
 
             //new event handler for text input as "textinput" doesn't fire
-            dataTextBox.AddHandler(TextBox.TextInputEvent,
+            dataTextBox.AddHandler(TextInputEvent,
                                     new TextCompositionEventHandler(dataTextBox_TextInput), 
                                     true);
         }
@@ -53,13 +62,13 @@ namespace Visualiser
         {
             OpenTKControl.Initialise();
             openTKHost.Child = OpenTKControl.openTKWindow;
-            frameData = new List<string>();
+            frames = new List<Frame>();
         }
 
         private void fullScreenButton_Click(object sender, RoutedEventArgs e)
         {
             openTKFull = new OpenTKFull();
-            Nullable<bool> result = openTKFull.ShowDialog();
+            bool? result = openTKFull.ShowDialog();
 
             if(result == false)
             {
@@ -84,7 +93,7 @@ namespace Visualiser
 
         private void Reset()
         {
-            frameData.Clear();
+            frames.Clear();
             dataTextBox.Clear();
             leapCheckBox.IsChecked = false;
             riftCheckBox.IsChecked = false;
@@ -93,6 +102,7 @@ namespace Visualiser
             dataGrid.Visibility = Visibility.Visible;
             animationGrid.Visibility = Visibility.Hidden;
             animationStatsGrid.Visibility = Visibility.Hidden;
+            saveDataButton.Visibility = Visibility.Hidden;
             CurrentFrame = 0;
             frameCountTextBlock.Text = "0 Frames Loaded";
             loadDataButton.Content = "Load Data";
@@ -101,55 +111,108 @@ namespace Visualiser
         private void dataFormatButton_Click(object sender, RoutedEventArgs e)
         {
             DataFormater formatWindow = new DataFormater();
-            Nullable<bool> result = formatWindow.ShowDialog();
-            string tempFormat = format;
-            format = formatWindow.formatTextBox.Text;
-
+            bool? result = formatWindow.ShowDialog();
+            Format tempFormat = format;
+            
             if(result == true)
             {
-                //format set - if frame count != 0 check against frames
-                //else check on creation of frame
-                int i = 0;
-                
+                string inputFormat = formatWindow.formatTextBox.Text.ToLower();
+                format = new Format();
+                format.correctFormat = true;
+                string[] splitFormat = inputFormat.Split(' ');
+                for(int i = 0; i < splitFormat.Length; i++)
+                {
+                    switch(splitFormat[i])
+                    {
+                        case "x":
+                            format.x = i + 1;
+                            break;
+                        case "y":
+                            format.y = i + 1;
+                            break;
+                        case "z":
+                            format.z = i + 1;
+                            break;
+                        case "1":
+                            format.data1 = i + 1;
+                            break;
+                        case "2":
+                            format.data2 = i + 1;
+                            break;
+                        case "3":
+                            format.data3 = i + 1;
+                            break;
+                        default:
+                            format.correctFormat = false;
+                            break;
+                    }
+                }
+
+                //if format doesn't contain any axis, prompt for new format
+                if(!splitFormat.Contains("x") && !splitFormat.Contains("y") && !splitFormat.Contains("z"))
+                {
+                    format.correctFormat = false;
+                }
+
+                List<int> failedFrames = new List<int>();
+
+                //format correct up to now - if frame count != 0 check against frames
+                if(format.correctFormat)
+                {
+                    if(frames.Count > 0)
+                    {
+                        for(int i = 0; i < frames.Count; i++)
+                        {
+                            if(!frames[i].FormatData())
+                            {
+                                failedFrames.Add(i + 1); //make list of frames it failed to format for error message
+                                format.correctFormat = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //check on creation of frame
+                    }
+                }
+                else
+                {
+                    format = tempFormat;    //if not correct then reset to prev
+                }
+                    
+
             }
             else
             {
                 //format cancelled
-                format = tempFormat;
+                
             }
         }
 
         private void loadDataButton_Click(object sender, RoutedEventArgs e)
         {
-            if(loadDataButton.Content.ToString() == "Load Data")
-            {
-                FileLoader(false);
-            }
-            else
-            {
-                FileLoader(true);
-            }
+            FileLoader(loadDataButton.Content.ToString() != "Load Data");
 
-            frameCountTextBlock.Text = frameData.Count + " Frames Loaded";
+            frameCountTextBlock.Text = frames.Count + " Frames Loaded";
         }
 
         private void FileLoader(bool multi)
         {
-            int prevCount = frameData.Count;
+            int prevCount = frames.Count;
 
             Microsoft.Win32.OpenFileDialog filePicker = new Microsoft.Win32.OpenFileDialog();
 
             if(multi)
                 filePicker.Multiselect = true;
 
-            Nullable<bool> result = filePicker.ShowDialog();
+            bool? result = filePicker.ShowDialog();
 
             if(result == true)
             {
                 string[] fileNames = filePicker.FileNames;
-                for(int i = 0; i < fileNames.Length; i++)
+                foreach (string t in fileNames)
                 {
-                    string[] lines = System.IO.File.ReadAllLines(fileNames[i]);
+                    string[] lines = System.IO.File.ReadAllLines(t);
                     string combinedText = "";
                     for (int j = 0; j < lines.Length; j++)
                     {
@@ -163,11 +226,9 @@ namespace Visualiser
                         }
                     }
 
-                    //frameList.add(new Frame(fileNames[i], combinedText (or line array), lines.length));
-
-                    frameData.Add(combinedText);
+                    frames.Add(new Frame(t, lines, combinedText));
                 }
-                if(prevCount == 0 && frameData.Count > 0)
+                if(prevCount == 0 && frames.Count > 0)
                 {
                     CurrentFrame = 1;
                 }
@@ -176,11 +237,11 @@ namespace Visualiser
 
         private void riftCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            string messageText = "To enable Oculus Rift stereoscopy and head tracking, full screen is required.\r\n" +
-                                    "Do you wish to enter full screen mode now?";
-            string messageTitle = "Switch To Full Screen?";
-            MessageBoxButton button = MessageBoxButton.YesNo;
-            MessageBoxImage icon = MessageBoxImage.Question;
+            const string messageText = "To enable Oculus Rift stereoscopy and head tracking, full screen is required.\r\n" +
+                                       "Do you wish to enter full screen mode now?";
+            const string messageTitle = "Switch To Full Screen?";
+            const MessageBoxButton button = MessageBoxButton.YesNo;
+            const MessageBoxImage icon = MessageBoxImage.Question;
 
             MessageBoxResult result = MessageBox.Show(messageText, messageTitle, button, icon);
 
@@ -201,18 +262,18 @@ namespace Visualiser
             animationGrid.Visibility = Visibility.Visible;
             animationStatsGrid.Visibility = Visibility.Visible;
             loadDataButton.Content = "Load Frames";
-            frameCountTextBlock.Text = frameData.Count + " Frames Loaded";
+            frameCountTextBlock.Text = frames.Count + " Frames Loaded";
         }
 
         private void animatedCheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (frameData.Count > 1)
+            if (frames.Count > 1)
             {
-                string messageText = "Multiple frames are currently loaded. To return to single data mode, please start a new session.\r\n" +
-                                        "Do you wish to start a new session now?";
-                string messageTitle = "Start New Session?";
-                MessageBoxButton button = MessageBoxButton.YesNo;
-                MessageBoxImage icon = MessageBoxImage.Question;
+                const string messageText = "Multiple frames are currently loaded. To return to single data mode, please start a new session.\r\n" +
+                                           "Do you wish to start a new session now?";
+                const string messageTitle = "Start New Session?";
+                const MessageBoxButton button = MessageBoxButton.YesNo;
+                const MessageBoxImage icon = MessageBoxImage.Question;
 
                 MessageBoxResult result = MessageBox.Show(messageText, messageTitle, button, icon);
 
@@ -232,7 +293,7 @@ namespace Visualiser
 
         private void stepBackButton_Click(object sender, RoutedEventArgs e)
         {
-            if (frameData.Count == 0)
+            if (frames.Count == 0)
             {
                 //do nothing
             }
@@ -240,7 +301,7 @@ namespace Visualiser
             {
                 if (CurrentFrame == 1)
                 {
-                    CurrentFrame = frameData.Count;
+                    CurrentFrame = frames.Count;
                 }
                 else
                 {
@@ -251,13 +312,13 @@ namespace Visualiser
 
         private void stepForwardButton_Click(object sender, RoutedEventArgs e)
         {
-            if(frameData.Count == 0)
+            if(frames.Count == 0)
             {
                 //do nothing
             }
             else
             {
-                if(CurrentFrame == frameData.Count)
+                if(CurrentFrame == frames.Count)
                 {
                     CurrentFrame = 1;
                 }
@@ -285,7 +346,7 @@ namespace Visualiser
         private void saveDataButton_Click(object sender, RoutedEventArgs e)
         {
             //save text box to frame data
-            if(frameData.Count == 0)
+            if(frames.Count == 0)
             {
                 Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
                 //if no frames loaded, open save dialog with blank name
@@ -302,6 +363,12 @@ namespace Visualiser
         private void customModelSelection_Selected(object sender, RoutedEventArgs e)
         {
             //model loader from project
+        }
+
+        private void dataTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Back)
+                saveButton.Visibility = Visibility.Visible;
         }
     }
 }

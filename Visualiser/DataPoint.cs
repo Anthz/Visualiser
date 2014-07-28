@@ -8,15 +8,16 @@ namespace Visualiser
 {
     class DataPoint
     {
-        float x, y, z;
-        float[] dataValues;
+        private float x, y, z, data1, data2, data3;
 
-        public DataPoint(float x, float y, float z, float[] dataValues)
+        public DataPoint(float x, float y, float z, float data1, float data2, float data3)
         {
             this.x = x;
             this.y = y;
             this.z = z;
-            this.dataValues = dataValues;
+            this.data1 = data1;
+            this.data2 = data2;
+            this.data3 = data3;
         }
 
         public void Render()

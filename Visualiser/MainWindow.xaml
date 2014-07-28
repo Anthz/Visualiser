@@ -42,8 +42,8 @@
             </GroupBox>
         </Grid>
 
-        <Grid x:Name="dataGrid" HorizontalAlignment="Right" Margin="0,272,10,39" Width="208" Visibility="Visible">
-            <TextBox x:Name="dataTextBox" Margin="0,-10,10,0" TextWrapping="Wrap" AcceptsReturn="True" TextInput="dataTextBox_TextInput"/>
+        <Grid x:Name="dataGrid" HorizontalAlignment="Right" Margin="0,272,07,39" Width="208" Visibility="Visible">
+            <TextBox x:Name="dataTextBox" Margin="0,-10,10,0" TextWrapping="Wrap" AcceptsReturn="True" TextInput="dataTextBox_TextInput" KeyUp="dataTextBox_KeyUp"/>
         </Grid>
 
         <Grid x:Name="animationGrid" HorizontalAlignment="Right" Height="Auto" Margin="0,0,20,53" VerticalAlignment="Bottom" Width="213" Visibility="Hidden">
@@ -57,7 +57,7 @@
             <TextBlock x:Name="frameCountTextBlock" Margin="0,0,244,0" TextWrapping="Wrap" Text="0 Frames Loaded" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="36" FontSize="16" TextAlignment="Center"/>
             <TextBlock x:Name="currentFrameTextBlock" Margin="0,0,74,0" TextWrapping="Wrap" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="36" FontSize="16" TextAlignment="Right" Width="148" Text="Current Frame: 0"/>
             <Button x:Name="viewFrameDataButton" Content=">" HorizontalAlignment="Right" Margin="0,0,54,14" VerticalAlignment="Bottom" Width="15" Height="20" Click="viewFrameDataButton_Click"/>
-            <Button x:Name="saveDataButton" Content="Save" HorizontalAlignment="Right" Margin="0,0,20,14" VerticalAlignment="Bottom" Width="Auto" Click="saveDataButton_Click" Visibility="Hidden"/>
         </Grid>
+        <Button x:Name="saveDataButton" Content="Save" HorizontalAlignment="Right" Margin="0,0,20,14" VerticalAlignment="Bottom" Width="Auto" Click="saveDataButton_Click" Visibility="Hidden"/>
     </Grid>
 </Window>
