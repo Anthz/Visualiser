@@ -11,6 +11,8 @@ namespace Visualiser
     public static class OpenTKControl
     {
         public static GLControl openTKWindow;
+        public static Matrix4 projMatrix;
+        public static Shader shader;
 
         public static void Initialise()
         {
@@ -19,10 +21,15 @@ namespace Visualiser
             openTKWindow.Load += OpenTKWindow_Load;
             openTKWindow.Paint += OpenTKWindow_Paint;
             openTKWindow.Resize += openTKWindow_Resize;
+
+            shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
         }
 
         public static void openTKWindow_Resize(object sender, EventArgs e)
         {
+            int w = openTKWindow.Width;
+            int h = openTKWindow.Height;
+
             GL.Viewport(0, 0, openTKWindow.Size.Width, openTKWindow.Size.Height);
             //Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, openTKWindow.Size.Width / (float)openTKWindow.Size.Height, 1.0f, 64.0f);
 

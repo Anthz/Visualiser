@@ -17,7 +17,7 @@ using OpenTK.Graphics.OpenGL;
 namespace Visualiser
 {
     /// <summary>
-    /// Interaction logic for OpenTKFull.xaml
+    /// Interaction logic for OpenTKFull.Xaml
     /// </summary>
     public partial class OpenTKFull : Window
     {

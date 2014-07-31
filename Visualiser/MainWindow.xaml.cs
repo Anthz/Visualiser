@@ -190,7 +190,6 @@ namespace Visualiser
         {
             FileLoader(loadDataButton.Content.ToString() != "Load Data");
 
-            Status = frames.Count + " Frame(s) Loaded";
             frameCountTextBlock.Text = "Frame Count: " + frames.Count;
         }
 
@@ -226,6 +225,8 @@ namespace Visualiser
 
                     frames.Add(new Frame(t, lines, combinedText));
                 }
+
+                Status = fileNames.Length + " Frame(s) Loaded";
 
                 if(prevCount == 0 && frames.Count > 0)
                 {

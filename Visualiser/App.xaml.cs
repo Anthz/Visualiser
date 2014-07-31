@@ -9,7 +9,7 @@ using System.Windows;
 namespace Visualiser
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Interaction logic for App.Xaml
     /// </summary>
     public partial class App : Application
     {

@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 namespace Visualiser
 {
     /// <summary>
-    /// Interaction logic for DataFormater.xaml
+    /// Interaction logic for DataFormater.Xaml
     /// </summary>
     public partial class DataFormater : Window
     {
