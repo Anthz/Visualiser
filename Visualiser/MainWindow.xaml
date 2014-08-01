@@ -29,7 +29,7 @@
                     <CheckBox x:Name="animatedCheckBox" Content="Animated" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Checked="animatedCheckBox_Checked" Unchecked="animatedCheckBox_Unchecked"/>
                     <Button x:Name="dataFormatButton" Content="Data Format" HorizontalAlignment="Left" Margin="114,162,0,0" VerticalAlignment="Top" Width="75" Click="dataFormatButton_Click"/>
                     <Button x:Name="loadDataButton" Content="Load Data" HorizontalAlignment="Left" Margin="11,162,0,0" VerticalAlignment="Top" Width="75" Click="loadDataButton_Click"/>
-                    <ComboBox x:Name="modelComboBox" HorizontalAlignment="Left" Margin="81,124,0,0" VerticalAlignment="Top" Width="120" Loaded="modelComboBox_Loaded">
+                    <ComboBox x:Name="modelComboBox" HorizontalAlignment="Left" Margin="81,124,0,0" VerticalAlignment="Top" Width="120" Loaded="modelComboBox_Loaded" SelectionChanged="modelComboBox_SelectionChanged">
                         <ComboBoxItem x:Name="sphereModelSelection" Content="Sphere"/>
                         <ComboBoxItem x:Name="cubeModelSelection" Content="Cube"/>
                         <ComboBoxItem x:Name="coneModelSelection" Content="Cone"/>

@@ -52,7 +52,7 @@ namespace Visualiser
                     return false;
                 }
 
-                dataPoints[i] = new DataPoint(x, y, z, dataValues.ToArray(), );
+                dataPoints[i] = new DataPoint(x, y, z, dataValues.ToArray());
             }
 
             return true;

@@ -13,6 +13,13 @@ namespace Visualiser
         public static GLControl openTKWindow;
         public static Matrix4 projMatrix;
         public static Shader shader;
+        public static Dictionary<string, Model> modelCollection = new Dictionary<string,Model>();
+        public static Model model;
+
+        public static void SetModel(string name)
+        {
+            model = modelCollection[name];  //make copy of model
+        }
 
         public static void Initialise()
         {
@@ -21,8 +28,19 @@ namespace Visualiser
             openTKWindow.Load += OpenTKWindow_Load;
             openTKWindow.Paint += OpenTKWindow_Paint;
             openTKWindow.Resize += openTKWindow_Resize;
+        }
 
-            shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
+        public static void ModelCollectionInit()
+        {
+            modelCollection.Add("sphere", new Model("Models/Sphere.obj", false));
+            modelCollection.Add("cube", new Model("Models/Cube.obj", false));
+            modelCollection.Add("cone", new Model("Models/Cone.obj", false));
+            modelCollection.Add("icosphere", new Model("Models/Icosphere.obj", false));
+        }
+
+        public static void SetCustomModel(string name, string fileName)
+        {
+            modelCollection.Add(name, new Model(fileName, false));
         }
 
         public static void openTKWindow_Resize(object sender, EventArgs e)
@@ -42,16 +60,12 @@ namespace Visualiser
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadIdentity();
+            GL.Disable(EnableCap.CullFace);
+            GL.Enable(EnableCap.DepthTest);
 
-            // Draw a little yellow triangle
-            GL.Color3(System.Drawing.Color.Yellow);
-            GL.Begin(BeginMode.Triangles);
-            GL.Vertex2(0.0, 0.0);
-            GL.Vertex2(100.0, 0.0);
-            GL.Vertex2(50.0, 100.0);
-            GL.End();
+            shader.Bind();
+            shader.SetUniform("ProjectionMatrix", projMatrix);
+            //add new shader code
 
             openTKWindow.SwapBuffers();
         }

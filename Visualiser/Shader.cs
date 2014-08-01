@@ -9,10 +9,12 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Visualiser
 {
-    class Shader
+    public class Shader
     {
         private bool initialised;
-        private int shader_vert, shader_frag, program_id;
+        private int shader_vert = 0;
+        private int shader_frag = 0;
+        public int program_id;
 
         /// <summary>
         /// textFileRead loads in a standard text file from a given fileName and
@@ -41,6 +43,10 @@ namespace Visualiser
                 Console.WriteLine("Shader " + shader + " compile error: " + message);
         }
 
+        public Shader()
+        {
+            initialised = false; // Declare we have not initialized the shader yet
+        }
 	        
         /// <summary>
         /// Constructor for a Shader object which creates a GLSL shader based on a given

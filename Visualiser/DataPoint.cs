@@ -14,10 +14,9 @@ namespace Visualiser
         float[] dataValues;
 
         Matrix4 modelMatrix;
-        Model model;
         Vector3 color = new Vector3(1.0f, 1.0f, 1.0f);
 
-        public DataPoint(float x, float y, float z, float[] dataValues, Model model)
+        public DataPoint(float x, float y, float z, float[] dataValues)
         {
             pos.X = x;
             pos.Y = y;
@@ -25,20 +24,19 @@ namespace Visualiser
             this.dataValues = dataValues;
 
             modelMatrix = Matrix4.CreateTranslation(pos);
-            this.model = model;
         }
         public void Render()
         {
             OpenTKControl.shader.SetUniform("ModelMatrix", modelMatrix);
-            GL.BindVertexArray(model.vertexArrayID);
+            GL.BindVertexArray(OpenTKControl.model.vertexArrayID);
             OpenTKControl.shader.SetUniform("InColor", color);
-            GL.DrawArrays(BeginMode.Triangles, 0, model.vertexCount);
+            GL.DrawArrays(BeginMode.Triangles, 0, OpenTKControl.model.vertexCount);
             GL.BindVertexArray(0);
         }
 
         public void Update()
         {
-
+            //OpenTKControl.shader.SetUniform("ModelMatrix", modelMatrix);
         }
     }
 }

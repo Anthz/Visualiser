@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Visualiser
 {
-    class Model
+    public class Model
     {
         List<Vector3> vertices;
         List<Vector3> normals;
@@ -18,10 +18,13 @@ namespace Visualiser
         public int vertexCount;
 
         public int vertexArrayID;
-        int[] vertexBufferIDs = new int[3];
+        int[] vertexBufferIDs;
 
-        public Model(string fileName)
+        bool textured;
+
+        public Model(string fileName, bool textured)
         {
+            this.textured = textured;
             LoadObj(fileName);
             BuildVAO();
         }
@@ -30,12 +33,20 @@ namespace Visualiser
         {
             int vertexAttributeLoc = GL.GetAttribLocation(OpenTKControl.shader.ID(), "InVertex");
 	        int normalAttributeLoc = GL.GetAttribLocation(OpenTKControl.shader.ID(), "InNormal");
-	        int textureAttributeLoc = GL.GetAttribLocation(OpenTKControl.shader.ID(), "InTexCoords");
 
             GL.GenVertexArrays(1, out vertexArrayID);
             GL.BindVertexArray(vertexArrayID);
 
-            GL.GenBuffers(3, vertexBufferIDs);
+            if(textured)
+            {
+                vertexBufferIDs = new int[3];
+                GL.GenBuffers(3, vertexBufferIDs);
+            }
+            else
+            {
+                vertexBufferIDs = new int[2];
+                GL.GenBuffers(2, vertexBufferIDs);
+            }
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferIDs[0]);
             GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(vertices.Count * Vector3.SizeInBytes), vertices.ToArray(), BufferUsageHint.StaticDraw);
             GL.EnableVertexAttribArray(vertexAttributeLoc);
@@ -46,10 +57,14 @@ namespace Visualiser
             GL.EnableVertexAttribArray(normalAttributeLoc);
             GL.VertexAttribPointer(normalAttributeLoc, 3, VertexAttribPointerType.Float, false, 0, 0);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferIDs[2]);
-            GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(textureVertices.Count * Vector2.SizeInBytes), textureVertices.ToArray(), BufferUsageHint.StaticDraw);
-            GL.EnableVertexAttribArray(textureAttributeLoc);
-            GL.VertexAttribPointer(textureAttributeLoc, 2, VertexAttribPointerType.Float, false, 0, 0);
+            if (textured)
+            {
+                int textureAttributeLoc = GL.GetAttribLocation(OpenTKControl.shader.ID(), "InTexCoords");
+                GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferIDs[2]);
+                GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(textureVertices.Count * Vector2.SizeInBytes), textureVertices.ToArray(), BufferUsageHint.StaticDraw);
+                GL.EnableVertexAttribArray(textureAttributeLoc);
+                GL.VertexAttribPointer(textureAttributeLoc, 2, VertexAttribPointerType.Float, false, 0, 0);
+            }
 
             GL.BindVertexArray(0);
         }
@@ -76,19 +91,7 @@ namespace Visualiser
 	        string line;
 	        while((line = reader.ReadLine()) != null) 
 	        {
-			    if(line.StartsWith("v"))
-			    {
-				    Vector3 vertex;
-                    List<string> values = line.Split(' ').ToList();
-                    values.RemoveAll(s => s.Contains(" "));                    
-
-                    vertex.X = float.Parse(values[1]);
-                    vertex.Y = float.Parse(values[2]);
-                    vertex.Z = float.Parse(values[3]);
-				    tempVertices.Add(vertex);
-			    }
-
-			    else if(line.StartsWith("vn"))
+			    if(line.StartsWith("vn"))
 			    {
                     Vector3 normal;
                     List<string> values = line.Split(' ').ToList();
@@ -111,29 +114,38 @@ namespace Visualiser
 				    tempTextureVertices.Add(tex);
 			    }
 
+                else if(line.StartsWith("v"))
+			    {
+				    Vector3 vertex;
+                    List<string> values = line.Split(' ').ToList();
+                    values.RemoveAll(s => s.Contains(" "));                    
+
+                    vertex.X = float.Parse(values[1]);
+                    vertex.Y = float.Parse(values[2]);
+                    vertex.Z = float.Parse(values[3]);
+				    tempVertices.Add(vertex);
+			    }
+
 			    else if(line.StartsWith("f"))
 			    {
 				    List<int> values = new List<int>();
                     List<string> tempValues = line.Split(' ').ToList();
+                    tempValues.RemoveAt(0);
                     tempValues.RemoveAll(s => s.Contains(" "));
                     foreach(string s in tempValues)
 	                {
 		                string[] temp = s.Split('/');
                         for(int i = 0; i < temp.Length; i++)
 	                    {
+                            if(temp[i] == "")
+                                temp[i] = "0";
 			                values.Add(int.Parse(temp[i]));
 	                    }
+                        vertexIndices.Add(values[0]);
+                        if(textured)
+                            textureIndices.Add(values[1]);
+                        normalIndices.Add(values[2]);
 	                }
-
-				    vertexIndices.Add(values[0]);
-				    vertexIndices.Add(values[1]);
-				    vertexIndices.Add(values[2]);
-				    normalIndices.Add(values[3]);
-				    normalIndices.Add(values[4]);
-				    normalIndices.Add(values[5]);
-				    textureIndices.Add(values[6]);
-				    textureIndices.Add(values[7]);
-				    textureIndices.Add(values[8]);
 			    }
 	        }
 
@@ -154,13 +166,16 @@ namespace Visualiser
 		        normals.Add(normal);
 	        }
 
-	        for(int i = 0; i < textureIndices.Count; i++)
-	        {
-		        int textureIndex = textureIndices[i];
+            if (textured)
+            {
+                for (int i = 0; i < textureIndices.Count; i++)
+                {
+                    int textureIndex = textureIndices[i];
 
-		        Vector2 textureVertex = tempTextureVertices[textureIndex - 1];
-		        textureVertices.Add(textureVertex);
-	        }
+                    Vector2 textureVertex = tempTextureVertices[textureIndex - 1];
+                    textureVertices.Add(textureVertex);
+                }
+            }
 
             vertexCount = vertexIndices.Count;
         }

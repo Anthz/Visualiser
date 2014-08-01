@@ -65,13 +65,18 @@ namespace Visualiser
             dataTextBox.AddHandler(TextInputEvent,
                                     new TextCompositionEventHandler(dataTextBox_TextInput), 
                                     true);
+            modelComboBox.Items.Add("Test");
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             OpenTKControl.Initialise();
+            //OpenTKControl.shader = shader;
             openTKHost.Child = OpenTKControl.openTKWindow;
             frames = new List<Frame>();
+
+            OpenTKControl.shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
+            OpenTKControl.ModelCollectionInit();
         }
 
         private void fullScreenButton_Click(object sender, RoutedEventArgs e)
@@ -423,6 +428,20 @@ namespace Visualiser
         {
             if(e.Key == Key.Back)
                 saveDataButton.Visibility = Visibility.Visible;
+        }
+
+        private void modelComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string selectionName = ((ComboBoxItem)modelComboBox.SelectedItem).Content.ToString().ToLower();
+
+            if(selectionName == "custom")
+            {
+                //new window to set name/file path of custom model
+            }
+            else
+            {
+                OpenTKControl.SetModel(selectionName);
+            }
         }
     }
 }
