@@ -1,4 +1,4 @@
-﻿using OpenTK;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Visualiser
 {
-    class DataPoint
+    public class DataPoint
     {
         private Vector3 pos;
         float[] dataValues;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +15,9 @@ namespace Visualiser
         public static Shader shader;
         public static Dictionary<string, Model> modelCollection = new Dictionary<string,Model>();
         public static Model model;
+        public static Camera camera;
+
+        private static long prevTime;
 
         public static void SetModel(string name)
         {
@@ -23,11 +26,14 @@ namespace Visualiser
 
         public static void Initialise()
         {
-            openTKWindow = new GLControl();
+            openTKWindow = new GLControl(OpenTK.Graphics.GraphicsMode.Default, 3, 3, OpenTK.Graphics.GraphicsContextFlags.ForwardCompatible);
+            //openTKWindow = new GLControl();
 
             openTKWindow.Load += OpenTKWindow_Load;
             openTKWindow.Paint += OpenTKWindow_Paint;
             openTKWindow.Resize += openTKWindow_Resize;
+
+            prevTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         }
 
         public static void ModelCollectionInit()
@@ -36,6 +42,8 @@ namespace Visualiser
             modelCollection.Add("cube", new Model("Models/Cube.obj", false));
             modelCollection.Add("cone", new Model("Models/Cone.obj", false));
             modelCollection.Add("icosphere", new Model("Models/Icosphere.obj", false));
+            Vector3 pos = new Vector3(0, 0, 10);
+            camera = new Camera(pos, 0, 0, 80, 0.1f, 1000, openTKWindow.Width / openTKWindow.Height);
         }
 
         public static void SetCustomModel(string name, string fileName)
@@ -45,15 +53,7 @@ namespace Visualiser
 
         public static void openTKWindow_Resize(object sender, EventArgs e)
         {
-            int w = openTKWindow.Width;
-            int h = openTKWindow.Height;
-
-            GL.Viewport(0, 0, openTKWindow.Size.Width, openTKWindow.Size.Height);
-            //Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, openTKWindow.Size.Width / (float)openTKWindow.Size.Height, 1.0f, 64.0f);
-
-            //GL.MatrixMode(MatrixMode.Projection);
-
-            //GL.LoadMatrix(ref projection);
+            camera.ResetProjMatrix();
         }
 
         public static void OpenTKWindow_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
@@ -64,8 +64,19 @@ namespace Visualiser
             GL.Enable(EnableCap.DepthTest);
 
             shader.Bind();
-            shader.SetUniform("ProjectionMatrix", projMatrix);
-            //add new shader code
+
+            long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            long deltaTime = timeNow - prevTime;
+            prevTime = timeNow;
+
+            camera.Update(deltaTime);
+
+            foreach(DataPoint point in MainWindow.frames[MainWindow.currentFrame].dataPoints)
+            {
+                point.Render();
+            }
+
+            shader.Unbind();
 
             openTKWindow.SwapBuffers();
         }
@@ -73,15 +84,6 @@ namespace Visualiser
         public static void OpenTKWindow_Load(object sender, EventArgs e)
         {
             GL.ClearColor(System.Drawing.Color.CornflowerBlue);
-
-            int w = openTKWindow.Width;
-            int h = openTKWindow.Height;
-
-            // Set up initial modes
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadIdentity();
-            GL.Ortho(0, w, 0, h, -1, 1);
-            GL.Viewport(0, 0, w, h);
         }
     }
 }

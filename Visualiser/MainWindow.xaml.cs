@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +20,9 @@ namespace Visualiser
     public partial class MainWindow : Window
     {
         OpenTKFull openTKFull;
-        private List<Frame> frames;
+        public static List<Frame> frames;
         public static Dictionary<string, int> format;
-        private int currentFrame = 0;
+        public static int currentFrame = 0;
         bool correctFormat;
         private string status;
         int statusDelay = 2000;

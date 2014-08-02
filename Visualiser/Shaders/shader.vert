@@ -1,10 +1,17 @@
-﻿#version 150 core
-in Vector3 InVertex;
-in Vector3 InColor;
-out Vector3 PassColor;
+//[VERTEX SHADER]
+#version 330
+ 
+in vec4 InVertex;
+in vec3 InNormal;
+in vec4 InColor;
 
-void main(void)
+out vec4 PassColor;
+
+uniform mat4 CameraMatrix, ModelMatrix;
+
+void main()
 {
-	gl_Position = vec4(InVertex, 1.0);
-	PassColor = InColor;
-}  
+	vec3 Normal = InNormal;
+    gl_Position = CameraMatrix * ModelMatrix * InVertex;
+    PassColor = InColor;
+}

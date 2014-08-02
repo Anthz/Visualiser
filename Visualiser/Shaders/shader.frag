@@ -1,8 +1,11 @@
-﻿#version 150 core
-in Vector3 PassColor;
-out vec4 OutColor;
+//[FRAGMENT SHADER]
+#version 330
+ 
+smooth in vec4 PassColor;
+ 
+out vec4 FragColor;
 
-void main(void)
+void main()
 {
-	OutColor = vec4(PassColor, 1.0);  
+	FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

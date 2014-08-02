@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Visualiser
 {
-    class Frame
+    public class Frame
     {
         string fileName;
         string[] data;
         public string displayData;
-        DataPoint[] dataPoints;
+        public DataPoint[] dataPoints;
 
         public Frame(string fileName, string[] data, string displayData)
         {
