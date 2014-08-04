@@ -1,3 +1,4 @@
+using OpenTK;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -53,7 +54,7 @@ namespace Visualiser
                     return false;
                 }
 
-                dataPoints[i] = new DataPoint(x, y, z, dataValues.ToArray());
+                dataPoints[i] = new DataPoint(new Vector3(x, y, z), 1, dataValues.ToArray());
             }
 
             return true;

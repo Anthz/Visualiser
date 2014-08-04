@@ -174,7 +174,7 @@ namespace Visualiser
         }
 
         // Setting 4x4 matrices
-        public void SetUniform(string name, Matrix4 matrix)
+        public void SetUniform(string name, ref Matrix4 matrix)
         {
 	        int loc = GL.GetUniformLocation(program_id, name);
             GL.UniformMatrix4(loc, false, ref matrix);

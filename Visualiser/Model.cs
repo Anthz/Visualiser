@@ -128,12 +128,13 @@ namespace Visualiser
 
 			    else if(line.StartsWith("f"))
 			    {
-				    List<int> values = new List<int>();
+				    
                     List<string> tempValues = line.Split(' ').ToList();
                     tempValues.RemoveAt(0);
                     tempValues.RemoveAll(s => s.Contains(" "));
                     foreach(string s in tempValues)
 	                {
+                        List<int> values = new List<int>();
 		                string[] temp = s.Split('/');
                         for(int i = 0; i < temp.Length; i++)
 	                    {

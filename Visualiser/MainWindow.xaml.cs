@@ -23,7 +23,7 @@ namespace Visualiser
         public static List<Frame> frames;
         public static Dictionary<string, int> format;
         public static int currentFrame = 0;
-        bool correctFormat;
+        public static bool correctFormat;
         private string status;
         int statusDelay = 2000;
 
@@ -71,7 +71,6 @@ namespace Visualiser
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             OpenTKControl.Initialise();
-            //OpenTKControl.shader = shader;
             openTKHost.Child = OpenTKControl.openTKWindow;
             frames = new List<Frame>();
 
@@ -124,6 +123,7 @@ namespace Visualiser
             frameCountTextBlock.Text = "Frame Count = 0";
             loadDataButton.Content = "Load Data";
             status = "";
+            OpenTKControl.openTKWindow.Invalidate();
         }
 
         private void dataFormatButton_Click(object sender, RoutedEventArgs e)
@@ -183,7 +183,10 @@ namespace Visualiser
                 else
                 {
                     format = tempFormat;    //if not correct then reset to prev
+                    correctFormat = false;
                 }
+
+                OpenTKControl.openTKWindow.Invalidate();
             }
             else
             {
@@ -196,6 +199,7 @@ namespace Visualiser
             FileLoader(loadDataButton.Content.ToString() != "Load Data");
 
             frameCountTextBlock.Text = "Frame Count: " + frames.Count;
+            OpenTKControl.openTKWindow.Invalidate();
         }
 
         private void FileLoader(bool multi)

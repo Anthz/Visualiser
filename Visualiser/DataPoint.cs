@@ -11,32 +11,32 @@ namespace Visualiser
     public class DataPoint
     {
         private Vector3 pos;
+        private float scale;
         float[] dataValues;
 
         Matrix4 modelMatrix;
         Vector3 color = new Vector3(1.0f, 1.0f, 1.0f);
 
-        public DataPoint(float x, float y, float z, float[] dataValues)
+        public DataPoint(Vector3 pos, float scale, float[] dataValues)
         {
-            pos.X = x;
-            pos.Y = y;
-            pos.Z = z;
+            this.pos = pos;
+            this.scale = scale;
             this.dataValues = dataValues;
 
-            modelMatrix = Matrix4.CreateTranslation(pos);
+            modelMatrix = Matrix4.CreateScale(scale) * Matrix4.CreateTranslation(pos);
         }
         public void Render()
         {
-            OpenTKControl.shader.SetUniform("ModelMatrix", modelMatrix);
+            OpenTKControl.shader.SetUniform("ModelMatrix", ref modelMatrix);
             GL.BindVertexArray(OpenTKControl.model.vertexArrayID);
             OpenTKControl.shader.SetUniform("InColor", color);
-            GL.DrawArrays(BeginMode.Triangles, 0, OpenTKControl.model.vertexCount);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, OpenTKControl.model.vertexCount);
             GL.BindVertexArray(0);
         }
 
         public void Update()
         {
-            //OpenTKControl.shader.SetUniform("ModelMatrix", modelMatrix);
+            //OpenTKControl.shader.SetUniform("ModelMatrix", ref modelMatrix);
         }
     }
 }

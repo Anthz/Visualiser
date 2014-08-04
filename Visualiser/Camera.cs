@@ -10,17 +10,17 @@ namespace Visualiser
 {
     public class Camera
     {
+        public Vector3 pos;
         private float fov;
         private float nearPlane;
         private float farPlane;
         private float aspectRatio;
         private Matrix4 orientation;
         private Matrix4 viewMatrix;
-        private Matrix4 projMatrix;
+        public Matrix4 projMatrix;
         private float xAngle;
         private float yAngle;
-
-        public Vector3 Pos { get; set; }
+        
         public float XAngle
         {
             get { return xAngle; }
@@ -41,19 +41,6 @@ namespace Visualiser
             }
         }
 
-        public Matrix4 CameraMatrix { get; set; }
-        public Matrix4 ProjMatrix
-        {
-            get { return projMatrix; }
-            set { projMatrix = value; }
-        }
-
-        public Matrix4 ViewMatrix
-        {
-            get { return viewMatrix; }
-            set { viewMatrix = value; }
-        }
-
         public Matrix4 Orientation
         {
             get { return orientation; }
@@ -67,7 +54,7 @@ namespace Visualiser
             {
                 float i = value;
                 fov = (float)MathHelper.Clamp(i, 0.0, 180.0);
-                ResetProjMatrix();
+                //ResetProjMatrix();
             }
         }
 
@@ -77,7 +64,7 @@ namespace Visualiser
             set
             {
                 nearPlane = value;
-                ResetProjMatrix();
+                //ResetProjMatrix();
             }
         }
 
@@ -87,7 +74,7 @@ namespace Visualiser
             set
             {
                 farPlane = value;
-                ResetProjMatrix();
+                //ResetProjMatrix();
             }
         }
 
@@ -97,38 +84,41 @@ namespace Visualiser
             set
             {
                 aspectRatio = value;
-                ResetProjMatrix();
+                //ResetProjMatrix();
             }
         }
 
         public Camera(Vector3 pos, float xRotation, float yRotation,
                         float fov, float nearPlane, float farPlane, float aspectRatio)
         {
-            Pos = pos;
+            this.pos = pos;
             XAngle = xRotation;
             YAngle = yRotation;
             FOV = fov;
             NearPlane = nearPlane;
             FarPlane = farPlane;
             AspectRatio = aspectRatio;
-            ResetProjMatrix();
+            projMatrix = Matrix4.Identity;
             NewOrientation();
         }
 
         public void Update(long deltaTime)
         {
-            CameraMatrix = projMatrix;
-            CameraMatrix *= Orientation;
-            CameraMatrix *= Matrix4.CreateTranslation(-Pos);
+            //viewMatrix = projMatrix;
+            //viewMatrix *= Orientation;
+            viewMatrix = Matrix4.CreateTranslation(-pos);
             
-            OpenTKControl.shader.SetUniform("CameraMatrix", CameraMatrix);
+            OpenTKControl.shader.SetUniform("ViewMatrix", ref viewMatrix);
         }
 
         public void ResetProjMatrix()
         {
             GL.Viewport(0, 0, OpenTKControl.openTKWindow.Size.Width, OpenTKControl.openTKWindow.Size.Height);
-            if(fov != 0 && aspectRatio.Equals(0.0f) && farPlane != 0)
-                projMatrix = Matrix4.CreatePerspectiveFieldOfView(fov, aspectRatio, nearPlane, farPlane);
+            if (fov != 0 && !aspectRatio.Equals(0.0f) && farPlane != 0)
+            {
+                projMatrix = Matrix4.CreatePerspectiveFieldOfView(fov, (float)OpenTKControl.openTKWindow.Size.Width / (float)OpenTKControl.openTKWindow.Size.Height, nearPlane, farPlane);
+                OpenTKControl.shader.SetUniform("ProjectionMatrix", ref projMatrix);
+            }
         }
 
         private Matrix4 NewOrientation()
