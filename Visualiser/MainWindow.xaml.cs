@@ -65,7 +65,6 @@ namespace Visualiser
             dataTextBox.AddHandler(TextInputEvent,
                                     new TextCompositionEventHandler(dataTextBox_TextInput), 
                                     true);
-            modelComboBox.Items.Add("Test");
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)

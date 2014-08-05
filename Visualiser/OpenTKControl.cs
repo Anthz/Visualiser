@@ -16,7 +16,6 @@ namespace Visualiser
         public static Shader shader;
         public static Dictionary<string, Model> modelCollection = new Dictionary<string,Model>();
         public static Model model;
-        public static Model testModel;
         public static Camera camera;
         public static int errorNo = 0;
 
@@ -41,10 +40,6 @@ namespace Visualiser
 
         static void openTKWindow_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
-            if(e.KeyChar == 'e')
-            {
-                Console.WriteLine(GL.GetError().ToString());
-            }
             if (e.KeyChar == 'w')
             {
                 camera.pos.Z -= 5;
@@ -55,6 +50,26 @@ namespace Visualiser
                 camera.pos.Z += 5;
                 openTKWindow.Invalidate();
             }
+            if (e.KeyChar == 'a')
+            {
+                camera.XAngle += (float)Math.PI / 10;
+                openTKWindow.Invalidate();
+            }
+            if (e.KeyChar == 'd')
+            {
+                camera.XAngle -= (float)Math.PI / 10;
+                openTKWindow.Invalidate();
+            }
+            if (e.KeyChar == 'q')
+            {
+                camera.pos.Y += 5;
+                openTKWindow.Invalidate();
+            }
+            if (e.KeyChar == 'e')
+            {
+                camera.pos.Y -= 5;
+                openTKWindow.Invalidate();
+            }
         }
 
         public static void ModelCollectionInit()
@@ -63,7 +78,6 @@ namespace Visualiser
             modelCollection.Add("cube", new Model("Models/Cube.obj", false));
             modelCollection.Add("cone", new Model("Models/Cone.obj", false));
             modelCollection.Add("icosphere", new Model("Models/Icosphere.obj", false));
-            testModel = new Model("Models/TestTriangle.obj", false);
             camera = new Camera(new Vector3(0, 0, 30), 0, 0, (float)Math.PI / 2, 0.1f, 100.0f, (float)openTKWindow.Width / (float)openTKWindow.Height);
         }
 
@@ -81,6 +95,7 @@ namespace Visualiser
 
         public static void OpenTKWindow_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
+            Console.WriteLine(GL.GetError().ToString() + " 0");
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.Disable(EnableCap.CullFace);
@@ -88,28 +103,28 @@ namespace Visualiser
 
             shader.Bind();
             shader.SetUniform("ProjectionMatrix", ref camera.projMatrix);
+            Console.WriteLine(GL.GetError().ToString() + " 1");
 
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             long deltaTime = timeNow - prevTime;
             prevTime = timeNow;
 
             camera.Update(deltaTime);
-
-            /*GL.BindVertexArray(model.vertexArrayID);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, OpenTKControl.model.vertexCount);
-            GL.BindVertexArray(0);*/
+            Console.WriteLine(GL.GetError().ToString() + " 2");
 
             if(MainWindow.frames.Count > 0 && MainWindow.correctFormat)
             {
                 foreach(DataPoint point in MainWindow.frames[MainWindow.currentFrame - 1].dataPoints)
                 {
+                    Console.WriteLine(GL.GetError().ToString() + MainWindow.currentFrame + " frame");
                     point.Render();
+                    Console.WriteLine(GL.GetError().ToString() + MainWindow.currentFrame + " frame(2)");
                 }
             }
 
             shader.Unbind();
 
-            Console.WriteLine(GL.GetError().ToString() + " 1");
+            Console.WriteLine(GL.GetError().ToString() + " Last");
 
             openTKWindow.SwapBuffers();
         }

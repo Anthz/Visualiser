@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -100,7 +100,8 @@ namespace Visualiser
             GL.AttachShader(program_id, shader_frag); // Attach the fragment shader to the program
 
 	        GL.BindAttribLocation(program_id, 0, "InVertex"); // Bind a constant attribute location for positions of vertices
-	        GL.BindAttribLocation(program_id, 1, "InColor"); // Bind another constant attribute location, this time for color
+            GL.BindAttribLocation(program_id, 1, "InNormal"); // Bind another constant attribute location, this time for color
+	        GL.BindAttribLocation(program_id, 2, "InColor"); // Bind another constant attribute location, this time for color
 
             GL.LinkProgram(program_id); // Link the vertex and fragment shaders in the program
             GL.ValidateProgram(program_id); // Validate the shader program

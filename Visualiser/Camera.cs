@@ -105,8 +105,9 @@ namespace Visualiser
         public void Update(long deltaTime)
         {
             //viewMatrix = projMatrix;
-            //viewMatrix *= Orientation;
-            viewMatrix = Matrix4.CreateTranslation(-pos);
+            viewMatrix = Orientation;
+            viewMatrix *= Matrix4.CreateTranslation(-pos);
+            
             
             OpenTKControl.shader.SetUniform("ViewMatrix", ref viewMatrix);
         }
