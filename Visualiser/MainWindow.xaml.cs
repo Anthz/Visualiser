@@ -73,17 +73,23 @@ namespace Visualiser
             openTKHost.Child = OpenTKControl.openTKWindow;
             frames = new List<Frame>();
 
-            OpenTKControl.shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
+            OpenTKControl.ChangeShader(0);
             OpenTKControl.ModelCollectionInit();
         }
 
         private void fullScreenButton_Click(object sender, RoutedEventArgs e)
         {
+            if(riftCheckBox.IsChecked == true)
+            {
+                OpenTKControl.RiftEnabled = true;
+            }
+
             openTKFull = new OpenTKFull();
             bool? result = openTKFull.ShowDialog();
 
-            if(result == false)
+            if(result == true || result == false)
             {
+                OpenTKControl.RiftEnabled = false;
                 openTKHost.Child = OpenTKControl.openTKWindow;
             }
         }
@@ -337,9 +343,9 @@ namespace Visualiser
                 const MessageBoxButton button = MessageBoxButton.YesNo;
                 const MessageBoxImage icon = MessageBoxImage.Question;
 
-                MessageBoxResult result = MessageBox.Show(messageText, messageTitle, button, icon);
+                MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, messageText, messageTitle, button, icon);
 
-                if (result == MessageBoxResult.Yes)
+                if(result == MessageBoxResult.Yes)
                 {
                     Reset();
                 }

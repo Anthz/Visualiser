@@ -17,13 +17,48 @@ namespace Visualiser
         public static Dictionary<string, Model> modelCollection = new Dictionary<string,Model>();
         public static Model model;
         public static Camera camera;
-        public static int errorNo = 0;
 
+        public static bool RiftEnabled
+        {
+            get { return riftEnabled; }
+            set
+            {
+                riftEnabled = value;
+                //camera.rift = new OculusRift();
+            }
+        }
+
+        private static bool riftEnabled;
         private static long prevTime;
 
         public static void SetModel(string name)
         {
             model = modelCollection[name];  //make copy of model
+            openTKWindow.Invalidate();
+        }
+
+        /// <summary>
+        /// Change current shader
+        /// </summary>
+        /// <param name="shaderID">0 - basic shader, 1 - basic rift, 2 - lighting, 3 - lighting rift, 4 - toon, 5 - toon rift</param>
+        public static void ChangeShader(int shaderID)
+        {
+            switch(shaderID)
+            {
+                case 0:
+                    shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+            }
         }
 
         public static void Initialise()
@@ -95,7 +130,6 @@ namespace Visualiser
 
         public static void OpenTKWindow_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
-            Console.WriteLine(GL.GetError().ToString() + " 0");
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.Disable(EnableCap.CullFace);
@@ -103,28 +137,22 @@ namespace Visualiser
 
             shader.Bind();
             shader.SetUniform("ProjectionMatrix", ref camera.projMatrix);
-            Console.WriteLine(GL.GetError().ToString() + " 1");
 
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             long deltaTime = timeNow - prevTime;
             prevTime = timeNow;
 
             camera.Update(deltaTime);
-            Console.WriteLine(GL.GetError().ToString() + " 2");
 
             if(MainWindow.frames.Count > 0 && MainWindow.correctFormat)
             {
                 foreach(DataPoint point in MainWindow.frames[MainWindow.currentFrame - 1].dataPoints)
                 {
-                    Console.WriteLine(GL.GetError().ToString() + MainWindow.currentFrame + " frame");
                     point.Render();
-                    Console.WriteLine(GL.GetError().ToString() + MainWindow.currentFrame + " frame(2)");
                 }
             }
 
             shader.Unbind();
-
-            Console.WriteLine(GL.GetError().ToString() + " Last");
 
             openTKWindow.SwapBuffers();
         }

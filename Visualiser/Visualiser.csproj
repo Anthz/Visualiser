@@ -61,6 +61,9 @@
     <Reference Include="OpenTK.GLControl, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.GLControl.1.1.1589.5942\lib\NET40\OpenTK.GLControl.dll</HintPath>
     </Reference>
+    <Reference Include="OpenTK.Rift">
+      <HintPath>..\packages\OpenTK.Rift.1.1.1529.101\lib\net40\OpenTK.Rift.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -167,6 +170,13 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\OpenTK.Rift.Windows.1.1.1529.101\build\OpenTK.Rift.Windows.targets" Condition="Exists('..\packages\OpenTK.Rift.Windows.1.1.1529.101\build\OpenTK.Rift.Windows.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\OpenTK.Rift.Windows.1.1.1529.101\build\OpenTK.Rift.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenTK.Rift.Windows.1.1.1529.101\build\OpenTK.Rift.Windows.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

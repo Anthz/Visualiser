@@ -20,6 +20,7 @@ namespace Visualiser
         public Matrix4 projMatrix;
         private float xAngle;
         private float yAngle;
+        public OculusRift rift;
         
         public float XAngle
         {
@@ -99,17 +100,18 @@ namespace Visualiser
             FarPlane = farPlane;
             AspectRatio = aspectRatio;
             projMatrix = Matrix4.Identity;
+            rift = new OculusRift();
             NewOrientation();
         }
 
         public void Update(long deltaTime)
         {
-            //viewMatrix = projMatrix;
-            viewMatrix = Orientation;
+            //viewMatrix = OpenTKControl.RiftEnabled ? Matrix4.CreateFromQuaternion(rift.PredictedOrientation) : viewMatrix = Orientation;
+            viewMatrix = Matrix4.CreateFromQuaternion(rift.PredictedOrientation);
             viewMatrix *= Matrix4.CreateTranslation(-pos);
             
-            
             OpenTKControl.shader.SetUniform("ViewMatrix", ref viewMatrix);
+            OpenTKControl.openTKWindow.Invalidate();
         }
 
         public void ResetProjMatrix()

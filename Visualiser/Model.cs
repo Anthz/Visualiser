@@ -53,14 +53,10 @@ namespace Visualiser
             GL.EnableVertexAttribArray(vertexAttributeLoc);
             GL.VertexAttribPointer(vertexAttributeLoc, 3, VertexAttribPointerType.Float, false, 0, 0);
 
-            Console.WriteLine(GL.GetError().ToString() + " First");
-
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferIDs[1]);
             GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(normals.Count * Vector3.SizeInBytes), normals.ToArray(), BufferUsageHint.StaticDraw);
             GL.EnableVertexAttribArray(normalAttributeLoc);
             GL.VertexAttribPointer(normalAttributeLoc, 3, VertexAttribPointerType.Float, false, 0, 0);
-
-            Console.WriteLine(GL.GetError().ToString() + " Firster");
 
             if (textured)
             {
