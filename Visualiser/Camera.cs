@@ -106,12 +106,15 @@ namespace Visualiser
 
         public void Update(long deltaTime)
         {
-            //viewMatrix = OpenTKControl.RiftEnabled ? Matrix4.CreateFromQuaternion(rift.PredictedOrientation) : viewMatrix = Orientation;
-            viewMatrix = Matrix4.CreateFromQuaternion(rift.PredictedOrientation);
+            if(OpenTKControl.RiftEnabled)
+                Orientation = Matrix4.CreateFromQuaternion(rift.PredictedOrientation);
+
+            viewMatrix = Orientation;
             viewMatrix *= Matrix4.CreateTranslation(-pos);
             
             OpenTKControl.shader.SetUniform("ViewMatrix", ref viewMatrix);
-            OpenTKControl.openTKWindow.Invalidate();
+            if(OpenTKControl.RiftEnabled)
+                OpenTKControl.openTKWindow.Invalidate();
         }
 
         public void ResetProjMatrix()
@@ -122,6 +125,17 @@ namespace Visualiser
                 projMatrix = Matrix4.CreatePerspectiveFieldOfView(fov, (float)OpenTKControl.openTKWindow.Size.Width / (float)OpenTKControl.openTKWindow.Size.Height, nearPlane, farPlane);
                 OpenTKControl.shader.SetUniform("ProjectionMatrix", ref projMatrix);
             }
+        }
+
+        public void ResetCamera()
+        {
+            //find start pos/angle
+        }
+
+        public void ResetRiftOrientation()
+        {
+            rift.Dispose();
+            rift = new OculusRift();
         }
 
         private Matrix4 NewOrientation()

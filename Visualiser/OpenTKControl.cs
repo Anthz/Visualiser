@@ -24,7 +24,6 @@ namespace Visualiser
             set
             {
                 riftEnabled = value;
-                //camera.rift = new OculusRift();
             }
         }
 
@@ -75,7 +74,7 @@ namespace Visualiser
 
         static void openTKWindow_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
-            if (e.KeyChar == 'w')
+            if(e.KeyChar == 'w')
             {
                 camera.pos.Z -= 5;
                 openTKWindow.Invalidate();
@@ -85,25 +84,29 @@ namespace Visualiser
                 camera.pos.Z += 5;
                 openTKWindow.Invalidate();
             }
-            if (e.KeyChar == 'a')
+            if(e.KeyChar == 'a')
             {
                 camera.XAngle += (float)Math.PI / 10;
                 openTKWindow.Invalidate();
             }
-            if (e.KeyChar == 'd')
+            if(e.KeyChar == 'd')
             {
                 camera.XAngle -= (float)Math.PI / 10;
                 openTKWindow.Invalidate();
             }
-            if (e.KeyChar == 'q')
+            if(e.KeyChar == 'q')
             {
                 camera.pos.Y += 5;
                 openTKWindow.Invalidate();
             }
-            if (e.KeyChar == 'e')
+            if(e.KeyChar == 'e')
             {
                 camera.pos.Y -= 5;
                 openTKWindow.Invalidate();
+            }
+            if (e.KeyChar == 'r')
+            {
+                camera.ResetRiftOrientation();
             }
         }
 

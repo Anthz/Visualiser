@@ -54,7 +54,7 @@ namespace Visualiser
                     return false;
                 }
 
-                dataPoints[i] = new DataPoint(new Vector3(x, y, z), 1, dataValues.ToArray());
+                dataPoints[i] = new DataPoint(new Vector3(x, y, z), 0.5f, dataValues.ToArray());
             }
 
             return true;

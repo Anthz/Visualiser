@@ -343,7 +343,7 @@ namespace Visualiser
                 const MessageBoxButton button = MessageBoxButton.YesNo;
                 const MessageBoxImage icon = MessageBoxImage.Question;
 
-                MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, messageText, messageTitle, button, icon);
+                MessageBoxResult result = MessageBox.Show(messageText, messageTitle, button, icon);
 
                 if(result == MessageBoxResult.Yes)
                 {
