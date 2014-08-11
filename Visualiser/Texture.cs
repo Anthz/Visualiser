@@ -11,7 +11,7 @@ namespace Visualiser
 {
     public class Texture
     {
-        static int LoadTexture(string filename)
+        public static int LoadTexture(string filename)
         {
             if(String.IsNullOrEmpty(filename))
                 throw new ArgumentException(filename);

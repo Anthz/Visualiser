@@ -73,7 +73,7 @@ namespace Visualiser
             openTKHost.Child = OpenTKControl.openTKWindow;
             frames = new List<Frame>();
 
-            OpenTKControl.ChangeShader(0);
+            OpenTKControl.ChangeShader(4);
             OpenTKControl.ModelCollectionInit();
         }
 

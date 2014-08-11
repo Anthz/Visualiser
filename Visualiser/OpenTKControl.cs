@@ -17,6 +17,7 @@ namespace Visualiser
         public static Dictionary<string, Model> modelCollection = new Dictionary<string,Model>();
         public static Model model;
         public static Camera camera;
+        public static HUD hud;
 
         public static bool RiftEnabled
         {
@@ -54,6 +55,7 @@ namespace Visualiser
                 case 3:
                     break;
                 case 4:
+                    shader = new Shader("Shaders/toonShader.vert", "Shaders/toonShader.frag");
                     break;
                 case 5:
                     break;
@@ -76,32 +78,32 @@ namespace Visualiser
         {
             if(e.KeyChar == 'w')
             {
-                camera.pos.Z -= 5;
+                camera.pos.Z -= 2;
                 openTKWindow.Invalidate();
             }
             if(e.KeyChar == 's')
             {
-                camera.pos.Z += 5;
+                camera.pos.Z += 2;
                 openTKWindow.Invalidate();
             }
             if(e.KeyChar == 'a')
             {
-                camera.XAngle += (float)Math.PI / 10;
+                camera.XAngle += (float)Math.PI / 20;
                 openTKWindow.Invalidate();
             }
             if(e.KeyChar == 'd')
             {
-                camera.XAngle -= (float)Math.PI / 10;
+                camera.XAngle -= (float)Math.PI / 20;
                 openTKWindow.Invalidate();
             }
             if(e.KeyChar == 'q')
             {
-                camera.pos.Y += 5;
+                camera.pos.Y += 2;
                 openTKWindow.Invalidate();
             }
             if(e.KeyChar == 'e')
             {
-                camera.pos.Y -= 5;
+                camera.pos.Y -= 2;
                 openTKWindow.Invalidate();
             }
             if (e.KeyChar == 'r')
@@ -116,7 +118,8 @@ namespace Visualiser
             modelCollection.Add("cube", new Model("Models/Cube.obj", false));
             modelCollection.Add("cone", new Model("Models/Cone.obj", false));
             modelCollection.Add("icosphere", new Model("Models/Icosphere.obj", false));
-            camera = new Camera(new Vector3(0, 0, 30), 0, 0, (float)Math.PI / 2, 0.1f, 100.0f, (float)openTKWindow.Width / (float)openTKWindow.Height);
+            camera = new Camera(new Vector3(0, 0, 30), 0, 0, (float)Math.PI / 2, 0.1f, 1000.0f, (float)openTKWindow.Width / (float)openTKWindow.Height);
+            hud = new HUD();
         }
 
         public static void SetCustomModel(string name, string fileName)
@@ -129,6 +132,7 @@ namespace Visualiser
             shader.Bind();
             camera.ResetProjMatrix();
             shader.Unbind();
+            hud.ResetOrthoMatrix();
         }
 
         public static void OpenTKWindow_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
@@ -136,10 +140,17 @@ namespace Visualiser
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.Disable(EnableCap.CullFace);
+            GL.Disable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+
+            hud.Render();
+
             GL.Enable(EnableCap.DepthTest);
 
             shader.Bind();
             shader.SetUniform("ProjectionMatrix", ref camera.projMatrix);
+            shader.SetUniform("lightDir", Vector3.Normalize(new Vector3(0, 0, 0) - camera.pos));
 
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             long deltaTime = timeNow - prevTime;

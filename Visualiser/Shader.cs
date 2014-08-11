@@ -42,11 +42,6 @@ namespace Visualiser
             if (message.Length > 0) // If we have any information to display
                 Console.WriteLine("Shader " + shader + " compile error: " + message);
         }
-
-        public Shader()
-        {
-            initialised = false; // Declare we have not initialized the shader yet
-        }
 	        
         /// <summary>
         /// Constructor for a Shader object which creates a GLSL shader based on a given

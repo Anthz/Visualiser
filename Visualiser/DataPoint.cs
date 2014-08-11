@@ -15,7 +15,7 @@ namespace Visualiser
         float[] dataValues;
 
         Matrix4 modelMatrix;
-        Vector4 color = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+        Vector4 color = new Vector4(1.0f, 0.8f, 0.5f, 1.0f);
 
         public DataPoint(Vector3 pos, float scale, float[] dataValues)
         {
