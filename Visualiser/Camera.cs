@@ -129,7 +129,8 @@ namespace Visualiser
 
         public void ResetCamera()
         {
-            //find start pos/angle
+            pos = new Vector3(0, 100, 100);
+            orientation = Matrix4.LookAt(pos, new Vector3(0), new Vector3(0, 1, 0));
         }
 
         public void ResetRiftOrientation()

@@ -66,32 +66,6 @@ namespace Visualiser
 			        x += 1.0f * (OpenTKControl.openTKWindow.Width / scale);
 		        }
 
-		        /*vertices_tmp[i * 12] = x_pos;
-		        vertices_tmp[i * 12 + 1] = y_pos;
-		        vertices_tmp[i * 12 + 2] = x_pos;
-		        vertices_tmp[i * 12 + 3] = y_pos - (OpenTKControl.openTKWindow.Height / scale);
-		        vertices_tmp[i * 12 + 4] = x_pos + (OpenTKControl.openTKWindow.Width / scale);
-		        vertices_tmp[i * 12 + 5] = y_pos - (OpenTKControl.openTKWindow.Height / scale);
-		        vertices_tmp[i * 12 + 6] = x_pos + (OpenTKControl.openTKWindow.Width / scale);
-		        vertices_tmp[i * 12 + 7] = y_pos - (OpenTKControl.openTKWindow.Height / scale);
-		        vertices_tmp[i * 12 + 8] = x_pos + (OpenTKControl.openTKWindow.Width / scale);
-		        vertices_tmp[i * 12 + 9] = y_pos;
-		        vertices_tmp[i * 12 + 10] = x_pos;
-		        vertices_tmp[i * 12 + 11] = y_pos;
-    
-		        texCoords_tmp[i * 12] = u;
-		        texCoords_tmp[i * 12 + 1] = 1.0f - v + 1.0f / rows;
-		        texCoords_tmp[i * 12 + 2] = u;
-		        texCoords_tmp[i * 12 + 3] = 1.0f - v;
-		        texCoords_tmp[i * 12 + 4] = u + 1.0f / cols;
-		        texCoords_tmp[i * 12 + 5] = 1.0f - v;
-		        texCoords_tmp[i * 12 + 6] = u + 1.0f / cols;
-		        texCoords_tmp[i * 12 + 7] = 1.0f - v;
-		        texCoords_tmp[i * 12 + 8] = u + 1.0f / cols;
-		        texCoords_tmp[i * 12 + 9] = 1.0f - v + 1.0f / rows;
-		        texCoords_tmp[i * 12 + 10] = u;
-		        texCoords_tmp[i * 12 + 11] = 1.0f - v + 1.0f / rows;*/
-
                 vertices_tmp.Add(x_pos);
                 vertices_tmp.Add(y_pos);
                 vertices_tmp.Add(x_pos);
@@ -119,8 +93,8 @@ namespace Visualiser
                 texCoords_tmp.Add(1.0f - v + 1.0f / rows);
 	        }
 
-	        int vertexAttributeLoc = GL.GetAttribLocation(OpenTKControl.shader.ID(), "InVertex");
-	        int texCoordsAttributeLoc = GL.GetAttribLocation(OpenTKControl.shader.ID(), "InTexCoords");
+	        int vertexAttributeLoc = GL.GetAttribLocation(shader.ID(), "InVertex");
+	        int texCoordsAttributeLoc = GL.GetAttribLocation(shader.ID(), "InTexCoords");
 
 	        GL.GenVertexArrays(1, out vertexArrayID);
             GL.BindVertexArray(vertexArrayID);
@@ -149,18 +123,18 @@ namespace Visualiser
             {
 	            GL.BindVertexArray(vertexArrayID);
 
-	            if(highlighted)
+	            /*if(highlighted)
 	            {
 		            shader.SetUniform("InColor", new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	            }
 	            else
 	            {
                     shader.SetUniform("InColor", new Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-	            }
+	            }*/
 	
 	            GL.ActiveTexture(TextureUnit.Texture0);
 	            GL.BindTexture(TextureTarget.Texture2D, fontAtlasID);
-	            shader.SetUniform("Texture", fontAtlasID);
+	            shader.SetUniform("Texture", 0);
 
 	            GL.DrawArrays(PrimitiveType.Triangles, 0, verticesCount);
 	            GL.BindVertexArray(0);

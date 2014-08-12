@@ -3,11 +3,11 @@
 
 in vec2 InVertex;
 in vec2 InTexCoords;
-in vec4 InColor;
 
 out vec2 TexCoords;
 out vec4 PassColor;
 
+uniform vec4 InColor;
 uniform mat4 ProjectionMatrix;
 
 void main()

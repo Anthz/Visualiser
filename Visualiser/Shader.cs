@@ -135,12 +135,23 @@ namespace Visualiser
 	        int loc = GL.GetUniformLocation(program_id, name);
             GL.Uniform1(loc, value);
         }
+        public void SetUniform(string name, ref int value)
+        {
+            int loc = GL.GetUniformLocation(program_id, name);
+            GL.Uniform1(loc, value);
+        }
 
         // Setting floats
         public void SetUniform(string name, float value)
         {
 	        int loc = GL.GetUniformLocation(program_id, name);
 	        GL.Uniform1(loc, value);
+        }
+
+        public void SetUniform(string name, ref float value)
+        {
+            int loc = GL.GetUniformLocation(program_id, name);
+            GL.Uniform1(loc, value);
         }
 
         // Setting vectors
@@ -162,6 +173,24 @@ namespace Visualiser
 	        GL.Uniform4(loc, vector);
         }
 
+        public void SetUniform(string name, ref Vector2 vector)
+        {
+            int loc = GL.GetUniformLocation(program_id, name);
+            GL.Uniform2(loc, vector);
+        }
+
+        public void SetUniform(string name, ref Vector3 vector)
+        {
+            int loc = GL.GetUniformLocation(program_id, name);
+            GL.Uniform3(loc, vector);
+        }
+
+        public void SetUniform(string name, ref Vector4 vector)
+        {
+            int loc = GL.GetUniformLocation(program_id, name);
+            GL.Uniform4(loc, vector);
+        }
+
         // Setting 3x3 matrices
         public void SetUniform(string name, Matrix3 matrix)
         {
@@ -170,9 +199,22 @@ namespace Visualiser
         }
 
         // Setting 4x4 matrices
-        public void SetUniform(string name, ref Matrix4 matrix)
+        public void SetUniform(string name, Matrix4 matrix)
         {
 	        int loc = GL.GetUniformLocation(program_id, name);
+            GL.UniformMatrix4(loc, false, ref matrix);
+        }
+
+        public void SetUniform(string name, ref Matrix3 matrix)
+        {
+            int loc = GL.GetUniformLocation(program_id, name);
+            GL.UniformMatrix3(loc, false, ref matrix);
+        }
+
+        // Setting 4x4 matrices
+        public void SetUniform(string name, ref Matrix4 matrix)
+        {
+            int loc = GL.GetUniformLocation(program_id, name);
             GL.UniformMatrix4(loc, false, ref matrix);
         }
     }

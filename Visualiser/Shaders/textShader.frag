@@ -14,8 +14,8 @@ void main()
 
 	if(TexColor == vec4(0.0f, 0.0f, 0.0f, 1.0f))
 	{
-		TexColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		discard;
 	}
 
-	FragColor = TexColor * PassColor;
+	FragColor = TexColor;
 }

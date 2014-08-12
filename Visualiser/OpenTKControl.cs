@@ -110,6 +110,10 @@ namespace Visualiser
             {
                 camera.ResetRiftOrientation();
             }
+            if (e.KeyChar == 'l')
+            {
+                Console.WriteLine(GL.GetError());
+            }
         }
 
         public static void ModelCollectionInit()
@@ -140,17 +144,13 @@ namespace Visualiser
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.Disable(EnableCap.CullFace);
-            GL.Disable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-
-            hud.Render();
-
             GL.Enable(EnableCap.DepthTest);
 
             shader.Bind();
             shader.SetUniform("ProjectionMatrix", ref camera.projMatrix);
-            shader.SetUniform("lightDir", Vector3.Normalize(new Vector3(0, 0, 0) - camera.pos));
+            shader.SetUniform("lightDir", Vector3.Normalize(camera.pos - new Vector3(0, 0, 0)));  //camera direction
 
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             long deltaTime = timeNow - prevTime;
@@ -167,6 +167,10 @@ namespace Visualiser
             }
 
             shader.Unbind();
+
+            GL.Disable(EnableCap.DepthTest);
+
+            hud.Render();
 
             openTKWindow.SwapBuffers();
         }

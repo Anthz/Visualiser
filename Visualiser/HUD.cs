@@ -14,6 +14,7 @@ namespace Visualiser
         Shader textShader;
         Text testText;
         int fontAtlasID;
+        int id, vertID;
 
         public HUD()
         {
@@ -25,7 +26,12 @@ namespace Visualiser
             fontAtlasID = Texture.LoadTexture("Fonts/nulshock_atlas.bmp");
             textShader = new Shader("Shaders/textShader.vert", "Shaders/textShader.frag");
             testText = new Text(fontAtlasID, ref textShader);
-            testText.ToText("Test", OpenTKControl.openTKWindow.Width / 2, OpenTKControl.openTKWindow.Height / 2, 50.0f);
+            testText.ToText("Test", OpenTKControl.openTKWindow.Width / 2, OpenTKControl.openTKWindow.Height / 2, 5.0f);
+
+            //id = GL.GenVertexArray();
+            //GL.BindVertexArray(id);
+
+            //vertID = GL.GenBuffer();
         }
 
         public void ResetOrthoMatrix()
