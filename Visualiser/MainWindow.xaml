@@ -46,11 +46,13 @@
             <TextBox x:Name="dataTextBox" Margin="0,-10,10,0" TextWrapping="Wrap" AcceptsReturn="True" TextInput="dataTextBox_TextInput" KeyUp="dataTextBox_KeyUp"/>
         </Grid>
 
-        <Grid x:Name="animationGrid" HorizontalAlignment="Right" Height="Auto" Margin="0,0,20,53" VerticalAlignment="Bottom" Width="213" Visibility="Hidden">
-            <Button x:Name="playButton" Content="Play" HorizontalAlignment="Left" Margin="23,10,0,0" VerticalAlignment="Top" Width="75" Height="75"/>
-            <Button x:Name="stopButton" Content="Stop" HorizontalAlignment="Left" Margin="138,10,0,0" VerticalAlignment="Top" Width="75" Height="75"/>
+        <Grid x:Name="animationGrid" HorizontalAlignment="Right" Height="235" Margin="0,0,20,39" VerticalAlignment="Bottom" Width="213" Visibility="Hidden">
+            <Button x:Name="playButton" Content="Play" HorizontalAlignment="Left" Margin="23,10,0,0" VerticalAlignment="Top" Width="75" Height="75" Click="playButton_Click"/>
+            <Button x:Name="stopButton" Content="Stop" HorizontalAlignment="Left" Margin="138,10,0,0" VerticalAlignment="Top" Width="75" Height="75" Click="stopButton_Click"/>
             <Button x:Name="stepBackButton" Content="Step Back" HorizontalAlignment="Left" Margin="23,110,0,0" VerticalAlignment="Top" Width="75" Height="75" Click="stepBackButton_Click"/>
             <Button x:Name="stepForwardButton" Content="Step Forward" HorizontalAlignment="Left" Margin="138,110,0,0" VerticalAlignment="Top" Width="75" Height="75" Click="stepForwardButton_Click"/>
+            <Slider x:Name="animationDelaySlider" HorizontalAlignment="Left" Margin="23,207,0,0" VerticalAlignment="Top" Width="190" Maximum="10000" AutoToolTipPlacement="TopLeft" Value="2000" SmallChange="100" LargeChange="1000" IsSnapToTickEnabled="True" Interval="50" TickFrequency="100" ValueChanged="animationDelaySlider_ValueChanged"/>
+            <GroupBox Header="Animation Delay (ms)" HorizontalAlignment="Left" Margin="10,190,-10,0" VerticalAlignment="Top" Height="43" Width="213"/>
         </Grid>
 
         <Grid x:Name="animationStatsGrid" Visibility="Hidden">

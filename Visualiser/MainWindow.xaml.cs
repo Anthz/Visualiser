@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using System.Timers;
 
 namespace Visualiser
 {
@@ -26,6 +27,9 @@ namespace Visualiser
         public static bool correctFormat;
         private string status;
         int statusDelay = 2000;
+        bool animated;
+        Timer animationTimer;
+        int animationDelay = 2000;
 
         public int CurrentFrame
         {
@@ -33,7 +37,26 @@ namespace Visualiser
 
             set
             {
-                currentFrame = value;
+                if(frames.Count == 0)
+                {
+                    currentFrame = 0;
+                }
+                else
+                {
+                    if(value < 1)
+                    {
+                        currentFrame = frames.Count;
+                    }
+                    else if(value > frames.Count)
+                    {
+                        currentFrame = 1;
+                    }
+                    else
+                    {
+                        currentFrame = value;
+                    }
+                }
+
                 currentFrameTextBlock.Text = "Current Frame: " + currentFrame;
                 dataTextBox.Text = currentFrame > 0 ? frames[currentFrame - 1].displayData : "";
             }
@@ -128,6 +151,7 @@ namespace Visualiser
             frameCountTextBlock.Text = "Frame Count = 0";
             loadDataButton.Content = "Load Data";
             status = "";
+            animationDelay = 2000;
             OpenTKControl.openTKWindow.Invalidate();
         }
 
@@ -326,11 +350,23 @@ namespace Visualiser
 
         private void animatedCheckBox_Checked(object sender, RoutedEventArgs e)
         {
+            animationTimer = new Timer(animationDelay);
+            animationTimer.Elapsed += animationTimer_Elapsed;
             dataGrid.Visibility = Visibility.Hidden;
             animationGrid.Visibility = Visibility.Visible;
             animationStatsGrid.Visibility = Visibility.Visible;
             loadDataButton.Content = "Load Frames";
             frameCountTextBlock.Text = "Frame Count: " + frames.Count;
+        }
+
+        void animationTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                CurrentFrame++;
+                OpenTKControl.openTKWindow.Invalidate();
+            }));
+            
         }
 
         private void animatedCheckBox_Unchecked(object sender, RoutedEventArgs e)
@@ -361,40 +397,12 @@ namespace Visualiser
 
         private void stepBackButton_Click(object sender, RoutedEventArgs e)
         {
-            if (frames.Count == 0)
-            {
-                //do nothing
-            }
-            else
-            {
-                if (CurrentFrame == 1)
-                {
-                    CurrentFrame = frames.Count;
-                }
-                else
-                {
-                    CurrentFrame--;
-                }
-            }
+            CurrentFrame--;
         }
 
         private void stepForwardButton_Click(object sender, RoutedEventArgs e)
         {
-            if(frames.Count == 0)
-            {
-                //do nothing
-            }
-            else
-            {
-                if(CurrentFrame == frames.Count)
-                {
-                    CurrentFrame = 1;
-                }
-                else
-                {
-                    CurrentFrame++;
-                }
-            }
+            CurrentFrame++;
         }
 
         private void viewFrameDataButton_Click(object sender, RoutedEventArgs e)
@@ -451,6 +459,40 @@ namespace Visualiser
             {
                 OpenTKControl.SetModel(selectionName);
             }
+        }
+
+        private void playButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(frames.Count > 0)
+            {
+                animated = animated ? false : true;
+                playButton.Content = animated ? "Pause" : "Play";
+
+                if(animated)
+                {
+                    animationTimer.Start();
+                }
+                else
+                {
+                    animationTimer.Stop();
+                }
+            }
+        }
+
+        private void stopButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(frames.Count > 0)
+            {
+                animated = false;
+                CurrentFrame = 1;
+            }
+        }
+
+        private void animationDelaySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            animationDelay = animationDelaySlider.Value == 0 ? 1 : (int)animationDelaySlider.Value;
+            if(animationTimer != null)
+                animationTimer.Interval = animationDelay;
         }
     }
 }

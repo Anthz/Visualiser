@@ -3,10 +3,10 @@
  
 in vec4 InVertex;
 in vec3 InNormal;
-in vec4 InColor;
 
 out vec4 PassColor;
 
+uniform vec4 InColor;
 uniform mat4 ProjectionMatrix, ViewMatrix, ModelMatrix;
 
 void main()

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using System.Timers;
 
 namespace Visualiser
 {
