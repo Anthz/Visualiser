@@ -106,10 +106,9 @@ namespace Visualiser
 
         public void Update(long deltaTime)
         {
-            if(OpenTKControl.RiftEnabled)
-                Orientation = Matrix4.CreateFromQuaternion(rift.PredictedOrientation);
-
             viewMatrix = Orientation;
+            if (OpenTKControl.RiftEnabled)
+                viewMatrix *= Matrix4.CreateFromQuaternion(rift.PredictedOrientation);
             viewMatrix *= Matrix4.CreateTranslation(-pos);
             
             OpenTKControl.shader.SetUniform("ViewMatrix", ref viewMatrix);

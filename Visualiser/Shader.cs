@@ -14,6 +14,7 @@ namespace Visualiser
         private bool initialised;
         private int shader_vert = 0;
         private int shader_frag = 0;
+        private int shader_geom = 0;
         public int program_id;
 
         /// <summary>
@@ -55,6 +56,13 @@ namespace Visualiser
     
             Init(vsFile, fsFile); // Initialize the shader
         }
+
+        public Shader(string vsFile, string fsFile, string gsFile)
+        {
+            initialised = false; // Declare we have not initialized the shader yet
+
+            Init(vsFile, fsFile, gsFile); // Initialize the shader
+        }
         
 	        
         /// <summary>
@@ -67,8 +75,6 @@ namespace Visualiser
         {
             if (initialised) // If we have already initialized the shader
                 return;
-
-            initialised = true; // Mark that we have initialized the shader
     
             shader_vert = GL.CreateShader(ShaderType.VertexShader); // Create a vertex shader
             shader_frag = GL.CreateShader(ShaderType.FragmentShader); // Create a fragment shader
@@ -95,11 +101,59 @@ namespace Visualiser
             GL.AttachShader(program_id, shader_frag); // Attach the fragment shader to the program
 
 	        GL.BindAttribLocation(program_id, 0, "InVertex"); // Bind a constant attribute location for positions of vertices
-            GL.BindAttribLocation(program_id, 1, "InNormal"); // Bind another constant attribute location, this time for color
+            GL.BindAttribLocation(program_id, 1, "InNormal"); // Bind another constant attribute location, this time for normals
 	        GL.BindAttribLocation(program_id, 2, "InColor"); // Bind another constant attribute location, this time for color
 
             GL.LinkProgram(program_id); // Link the vertex and fragment shaders in the program
             GL.ValidateProgram(program_id); // Validate the shader program
+
+            initialised = true; // Mark that we have initialized the shader
+        }
+
+        void Init(string vsFile, string fsFile, string gsFile)
+        {
+            if (initialised) // If we have already initialized the shader
+                return;
+
+            shader_vert = GL.CreateShader(ShaderType.VertexShader); // Create a vertex shader
+            shader_frag = GL.CreateShader(ShaderType.FragmentShader); // Create a fragment shader
+            shader_geom = GL.CreateShader(ShaderType.GeometryShader); // Create a geometry shader
+
+            string vsText = ReadFile(vsFile); // Read in the vertex shader
+            string fsText = ReadFile(fsFile); // Read in the fragment shader
+            string gsText = ReadFile(gsFile); // Read in the geometry shader
+
+            if (vsText == string.Empty || fsText == string.Empty || gsText == string.Empty)
+            {
+                Console.WriteLine("File not found."); // Output the error
+                return;
+            }
+
+            GL.ShaderSource(shader_vert, vsText);
+            GL.CompileShader(shader_vert);
+            ValidateShader(shader_vert);
+
+            GL.ShaderSource(shader_frag, fsText);
+            GL.CompileShader(shader_frag);
+            ValidateShader(shader_frag);
+
+            GL.ShaderSource(shader_geom, gsText);
+            GL.CompileShader(shader_geom);
+            ValidateShader(shader_geom);
+
+            program_id = GL.CreateProgram(); // Create a GLSL program
+            GL.AttachShader(program_id, shader_vert); // Attach a vertex shader to the program
+            GL.AttachShader(program_id, shader_frag); // Attach the fragment shader to the program
+            GL.AttachShader(program_id, shader_geom); // Attach the geometry shader to the program
+
+            GL.BindAttribLocation(program_id, 0, "InVertex"); // Bind a constant attribute location for positions of vertices
+            GL.BindAttribLocation(program_id, 1, "InNormal"); // Bind another constant attribute location, this time for normals
+            GL.BindAttribLocation(program_id, 2, "InColor"); // Bind another constant attribute location, this time for color
+
+            GL.LinkProgram(program_id); // Link the vertex and fragment shaders in the program
+            GL.ValidateProgram(program_id); // Validate the shader program
+
+            initialised = true; // Mark that we have initialized the shader
         }
 
         

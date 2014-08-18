@@ -398,11 +398,13 @@ namespace Visualiser
         private void stepBackButton_Click(object sender, RoutedEventArgs e)
         {
             CurrentFrame--;
+            OpenTKControl.openTKWindow.Invalidate();
         }
 
         private void stepForwardButton_Click(object sender, RoutedEventArgs e)
         {
             CurrentFrame++;
+            OpenTKControl.openTKWindow.Invalidate();
         }
 
         private void viewFrameDataButton_Click(object sender, RoutedEventArgs e)
@@ -485,6 +487,7 @@ namespace Visualiser
             {
                 animated = false;
                 CurrentFrame = 1;
+                OpenTKControl.openTKWindow.Invalidate();
             }
         }
 

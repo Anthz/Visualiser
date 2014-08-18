@@ -10,6 +10,58 @@ using System.Timers;
 
 namespace Visualiser
 {
+    public class Distortion
+    {
+        public Shader distortionShader;
+        public int frameBufferID, renderBufferID, textureID;
+        public int width, height;
+        public bool initialised;
+        public int testTex;
+
+        public Distortion(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+            Init();
+        }
+
+        private void Init()
+        {
+            frameBufferID = GL.GenFramebuffer();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, frameBufferID);
+
+            textureID = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, textureID);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, width, height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, new IntPtr(0));
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);  //try .Nearest
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);  //ditto
+
+            renderBufferID = GL.GenRenderbuffer();
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, renderBufferID);
+            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent, width, height);
+            GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, renderBufferID);
+
+            GL.FramebufferTexture(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0, textureID, 0);
+
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+
+            distortionShader = new Shader("Shaders/Oculus/empty.shdr", "Shaders/Oculus/barrel.frag", "Shaders/Oculus/barrel.geom");
+            testTex = Texture.LoadTexture("Textures/brick.bmp");
+            initialised = true;
+        }
+
+        public void Start()
+        {
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, frameBufferID);
+            GL.Viewport(0, 0, width, height);
+        }
+
+        public void Stop()
+        {
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+        }
+    }
+
     public static class OpenTKControl
     {
         public static GLControl openTKWindow;
@@ -19,6 +71,7 @@ namespace Visualiser
         public static Model model;
         public static Camera camera;
         public static HUD hud;
+        public static Distortion distortion;
 
         public static bool RiftEnabled
         {
@@ -26,6 +79,8 @@ namespace Visualiser
             set
             {
                 riftEnabled = value;
+                if(value == true)
+                    camera.ResetRiftOrientation();
             }
         }
 
@@ -123,8 +178,9 @@ namespace Visualiser
             modelCollection.Add("cube", new Model("Models/Cube.obj", false));
             modelCollection.Add("cone", new Model("Models/Cone.obj", false));
             modelCollection.Add("icosphere", new Model("Models/Icosphere.obj", false));
-            camera = new Camera(new Vector3(0, 0, 30), 0, 0, (float)Math.PI / 2, 0.1f, 1000.0f, (float)openTKWindow.Width / (float)openTKWindow.Height);
+            camera = new Camera(new Vector3(0, 40, 40), 1.57f, 0, (float)Math.PI / 2, 0.1f, 1000.0f, (float)openTKWindow.Width / (float)openTKWindow.Height);
             hud = new HUD();
+            distortion = new Distortion(1280, 800);
         }
 
         public static void SetCustomModel(string name, string fileName)
@@ -149,6 +205,8 @@ namespace Visualiser
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             GL.Enable(EnableCap.DepthTest);
 
+            distortion.Start();
+
             shader.Bind();
             shader.SetUniform("ProjectionMatrix", ref camera.projMatrix);
             shader.SetUniform("lightDir", Vector3.Normalize(camera.pos - new Vector3(0, 0, 0)));  //camera direction
@@ -169,9 +227,23 @@ namespace Visualiser
 
             shader.Unbind();
 
-            GL.Disable(EnableCap.DepthTest);
+            distortion.Stop();
 
-            hud.Render();
+            int temp = GL.GenVertexArray();
+            GL.BindVertexArray(temp);
+            //GL.BindFramebuffer(FramebufferTarget.Framebuffer, distortion.frameBufferID);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, distortion.testTex);    //test texture works, framebuffer doesn't
+            distortion.distortionShader.Bind();
+            distortion.distortionShader.SetUniform("Texture", 0);
+            GL.DrawArrays(PrimitiveType.Points, 0, 1);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            //GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            GL.BindVertexArray(0);
+
+            //GL.Disable(EnableCap.DepthTest);
+
+            //hud.Render();
 
             openTKWindow.SwapBuffers();
         }
